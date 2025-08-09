@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QuietPath • Funeral Cost Calculator</title>
+
+  <!-- Fonts: Raleway (headings) + Lato (body) -->
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&family=Raleway:wght@600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #fcfbf9;
+      --fg: #1a1a1a;
+      --subtle:#6b7280;
+      --dusty-blue:#5a7da3;
+      --muted-plum:#6e608c;
+      --warm-sand:#e8dcc8;
+      --border:#e5e7eb;
+      --white:#ffffff;
+      --focus:#ffbf47;
+    }
+    html, body{
+      margin:0; padding:0; background: var(--bg); color: var(--fg);
+      font-family: Lato, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      line-height:1.6; font-size:16px;
+    }
+    .container{ max-width: 1000px; margin: 0 auto; padding: 24px 18px 64px; }
+    header h1{
+      font-family: Raleway, Lato, system-ui, sans-serif;
+      font-weight: 800; font-size: clamp(1.6rem, 3vw, 2.2rem);
+      margin: 4px 0 10px; color: var(--dusty-blue);
+    }
+    .lede{ font-size: 1.05rem; color: var(--subtle); max-width: 70ch; }
+    .notice{ margin: 14px 0 22px; background: var(--white); border: 1px solid var(--border);
+      border-radius: 14px; padding: 14px 16px; }
+    .intro-card{ background: var(--warm-sand); border: 1px solid var(--border); border-radius: 16px; padding: 18px; display: grid; gap: 12px; }
+    .intro-title{ font-family: Raleway, Lato, system-ui, sans-serif; font-weight: 700; font-size: 1.2rem; margin: 0 0 4px; color: var(--muted-plum); }
+    .cta-row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top: 4px; }
+    .btn{ appearance:none; border:1px solid var(--dusty-blue); background: var(--dusty-blue); color:#fff; border-radius: 999px; padding: 10px 14px; font-size: 1rem; cursor:pointer; }
+    .btn.secondary{ background: transparent; color: var(--dusty-blue); }
+    .btn:focus{ outline: 3px solid var(--focus); outline-offset:2px; }
+    .grid{ display:grid; grid-template-columns: 1fr; gap:16px; margin-top:16px; }
+    @media(min-width: 880px){ .grid{ grid-template-columns: 1fr 1fr; } }
+    .card{ background: var(--white); border:1px solid var(--border); border-radius: 16px; padding: 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.035); }
+    .section-title{ font-family: Raleway, Lato, system-ui, sans-serif; font-weight:700; margin: 0 0 8px; color: var(--muted-plum); font-size: 1.15rem; }
+    .controls .row{ display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px dashed var(--border); }
+    .controls .row:last-child{ border-bottom:none; }
+    select{ font-size:1rem; padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:#fff; color:var(--fg); }
+    .scenario-toggle{ display:flex; gap:8px; flex-wrap:wrap; }
+    .pill-toggle{ border:1px solid var(--border); background:#fff; color:var(--fg); padding:8px 12px; border-radius:999px; cursor:pointer; }
+    .pill-toggle[aria-pressed="true"]{ border-color: var(--dusty-blue); box-shadow: inset 0 0 0 1px var(--dusty-blue); color: var(--dusty-blue); font-weight:700; }
+    .totals{ display:flex; flex-direction:column; gap:10px; }
+    .total-line{ display:flex; justify-content:space-between; }
+    .grand{ font-weight:800; font-size:1.35rem; border-top:2px solid var(--border); padding-top:10px; color: var(--dusty-blue); }
+    .group{ margin-top: 12px; border-top:1px solid var(--border); padding-top:10px; }
+    .group h3{ font-family: Raleway, Lato, system-ui, sans-serif; font-size:1.05rem; margin: 0 0 8px; color: var(--dusty-blue); }
+    table{ width:100%; border-collapse: collapse; }
+    thead th{ text-align:left; padding: 10px; background: #f7f7f8; border-bottom:1px solid var(--border); }
+    tbody td{ border-bottom:1px solid var(--border); padding: 10px; vertical-align: middle; }
+    .right{ text-align:right; }
+    .row-actions{ display:flex; gap:10px; justify-content:flex-end; font-size: 0.95rem; }
+    .link{ color: var(--dusty-blue); text-decoration: underline; background:none; border:none; padding:0; cursor:pointer; font: inherit; }
+    .muted{ color: #9aa0a6; }
+    .amount-view{ font-variant-numeric: tabular-nums; font-weight: 700; }
+    .amount-edit{ display:none; }
+    .amount-input{ width: 140px; padding:8px 10px; border:1px solid var(--border); border-radius:10px; font-size:1rem; text-align:right; }
+    .disabled{ color:#9aa0a6; background:#fafafa; }
+    .footer-actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:16px; }
+    .btn.small{ padding:8px 12px; font-size:0.95rem; }
+    @media print{ .intro-card .cta-row, .footer-actions, #customizeWrap{ display:none !important; } .container{ padding: 0; } body{ background:white; } .card{ box-shadow:none; border-color:#ddd; } }
+    :focus{ outline: 3px solid var(--focus); outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Funeral Cost Calculator</h1>
+      <p class="lede">A starting point to see typical costs, without pressure to decide everything right now.</p>
+
+      <div class="intro-card">
+        <div class="intro-title">How this works</div>
+        <div>This sample uses a traditional burial with a service, with cemetery costs included. You can review the total first, then open the options to adjust details for your needs and location.</div>
+        <div class="notice"><strong>Note:</strong> These estimates use national averages from the National Funeral Directors Association and other public sources. Actual costs vary by provider and region.</div>
+        <div class="cta-row" id="customizeWrap">
+          <button class="btn" id="btnCustomize">Customize details</button>
+          <button class="btn secondary" id="btnShowOptions">Quick options</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="card" style="margin-top:16px;" aria-labelledby="totalsTitle">
+      <h2 id="totalsTitle" class="section-title">Your Estimate</h2>
+      <div class="totals" aria-live="polite" aria-atomic="true">
+        <div class="total-line"><span>Items Subtotal</span><span id="subtotal" class="amount-view">$0</span></div>
+        <div class="total-line"><span>State Multiplier</span><span id="multiplier">×1.00</span></div>
+        <div class="total-line grand"><span>Total Estimate</span><span id="grand" class="amount-view">$0</span></div>
+        <div class="total-line"><span class="muted">Scenario</span><span id="scenarioBadge">Traditional burial, cemetery on</span></div>
+      </div>
+    </section>
+
+    <section id="controlsSection" class="grid" style="display:none;" aria-label="Calculator controls">
+      <div class="card" aria-labelledby="scenarioTitle">
+        <h2 id="scenarioTitle" class="section-title">Options</h2>
+        <div class="controls">
+          <div class="row" aria-live="polite">
+            <label class="muted" id="scenarioLabel">Service type</label>
+            <div class="scenario-toggle" role="group" aria-labelledby="scenarioLabel">
+              <button class="pill-toggle" id="btn-burial" aria-pressed="true">Traditional burial</button>
+              <button class="pill-toggle" id="btn-cremation" aria-pressed="false">Traditional cremation</button>
+            </div>
+          </div>
+          <div class="row">
+            <label class="muted">Cemetery costs</label>
+            <div class="scenario-toggle">
+              <button class="pill-toggle" id="btn-cemetery-on" aria-pressed="true">On</button>
+              <button class="pill-toggle" id="btn-cemetery-off" aria-pressed="false">Off</button>
+            </div>
+          </div>
+          <div class="row">
+            <label for="stateSelect" class="muted">State</label>
+            <select id="stateSelect"></select>
+            <span class="muted">Applies a broad regional cost factor.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" aria-labelledby="editHelp">
+        <h2 id="editHelp" class="section-title">Editing</h2>
+        <ul class="muted" style="margin:0 0 8px 18px;">
+          <li>Use <em>Remove</em> to exclude an item. You can add it back.</li>
+          <li>Select <em>Edit amount</em> to adjust a line, then Save.</li>
+          <li>Totals update automatically.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="itemsSection" class="card" style="display:none; margin-top:16px;" aria-labelledby="itemsTitle">
+      <h2 id="itemsTitle" class="section-title">Itemized Costs</h2>
+
+      <div class="group" id="grpFuneral">
+        <h3>Funeral home services</h3>
+        <table><thead><tr><th>Item</th><th class="right">Amount</th><th class="right">Actions</th></tr></thead>
+          <tbody id="bodyFuneral"></tbody>
+        </table>
+      </div>
+
+      <div class="group" id="grpTransport">
+        <h3>Transportation</h3>
+        <table><thead><tr><th>Item</th><th class="right">Amount</th><th class="right">Actions</th></tr></thead>
+          <tbody id="bodyTransport"></tbody>
+        </table>
+      </div>
+
+      <div class="group" id="grpCeremony">
+        <h3>Viewing and ceremony</h3>
+        <table><thead><tr><th>Item</th><th class="right">Amount</th><th class="right">Actions</th></tr></thead>
+          <tbody id="bodyCeremony"></tbody>
+        </table>
+      </div>
+
+      <div class="group" id="grpBurial">
+        <h3>Burial and cemetery</h3>
+        <table><thead><tr><th>Item</th><th class="right">Amount</th><th class="right">Actions</th></tr></thead>
+          <tbody id="bodyBurial"></tbody>
+        </table>
+      </div>
+
+      <div class="group" id="grpCremation">
+        <h3>Cremation</h3>
+        <table><thead><tr><th>Item</th><th class="right">Amount</th><th class="right">Actions</th></tr></thead>
+          <tbody id="bodyCremation"></tbody>
+        </table>
+      </div>
+
+      <div class="footer-actions">
+        <button class="btn small secondary" id="btnPrint">Print / Save as PDF</button>
+        <button class="btn small" id="btnCSV">Download CSV</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const STATE_MULTIPLIERS = {
+      "California":1.2,"New York":1.2,"Massachusetts":1.2,"Connecticut":1.2,"New Jersey":1.2,
+      "District of Columbia":1.2,"Washington":1.2,"Oregon":1.2,"Hawaii":1.2,"Alaska":1.2,"Maryland":1.2,
+      "Alabama":0.8,"Arkansas":0.8,"Mississippi":0.8,"Oklahoma":0.8,"Kentucky":0.8,"West Virginia":0.8,
+      "Louisiana":0.8,"Tennessee":0.8,"Missouri":0.8,"New Mexico":0.8,"South Carolina":0.8,"Idaho":0.8
+    };
+    const ALL_STATES = [
+      "Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","District of Columbia","Florida",
+      "Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts",
+      "Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico",
+      "New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina",
+      "South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"
+    ];
+    const ITEMS = [
+      { id:'basic_services', label:'Basic services of funeral director and staff', base:2300, group:'funeral', appliesTo:'both' },
+      { id:'transfer', label:'Transfer of remains', base:350, group:'transport', appliesTo:'both' },
+      { id:'embalming', label:'Embalming', base:750, group:'funeral', appliesTo:'burial' },
+      { id:'viewing', label:'Viewing or visitation', base:450, group:'ceremony', appliesTo:'both' },
+      { id:'ceremony', label:'Funeral ceremony', base:500, group:'ceremony', appliesTo:'both' },
+      { id:'hearse', label:'Hearse', base:350, group:'transport', appliesTo:'burial' },
+      { id:'service_car', label:'Service car or van', base:150, group:'transport', appliesTo:'both' },
+      { id:'metal_casket', label:'Metal casket', base:2500, group:'burial', appliesTo:'burial' },
+      { id:'vault', label:'Vault', base:1500, group:'burial', appliesTo:'burial', isCemetery:true },
+      { id:'plot', label:'Cemetery plot', base:2000, group:'burial', appliesTo:'both', isCemetery:true },
+      { id:'opening', label:'Opening and closing grave', base:1200, group:'burial', appliesTo:'both', isCemetery:true },
+      { id:'headstone', label:'Headstone or marker', base:2000, group:'burial', appliesTo:'both', isCemetery:true },
+      { id:'cremation_fee', label:'Cremation fee', base:350, group:'cremation', appliesTo:'cremation' },
+      { id:'urn', label:'Urn', base:250, group:'cremation', appliesTo:'cremation' }
+    ];
+    let scenario = 'burial', cemeteryOn = true, multiplier = 1.0;
+    const itemState = new Map();
+
+    function appliesNow(item){ return item.appliesTo === 'both' || item.appliesTo === scenario; }
+    function cemeteryOK(item){ return item.isCemetery ? cemeteryOn : true; }
+    function initDefaults(){ itemState.clear(); ITEMS.forEach(it => itemState.set(it.id,{enabled: appliesNow(it)&&cemeteryOK(it), amount: it.base})); }
+    function fmtUSD(n){ return Number(n).toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0}); }
+    const subtotalEl = document.getElementById('subtotal');
+    const grandEl = document.getElementById('grand');
+    const multiplierEl = document.getElementById('multiplier');
+    const scenarioBadge = document.getElementById('scenarioBadge');
+    const controlsSection = document.getElementById('controlsSection');
+    const itemsSection = document.getElementById('itemsSection');
+    const btnCustomize = document.getElementById('btnCustomize');
+    const btnShowOptions = document.getElementById('btnShowOptions');
+    const btnBurial = document.getElementById('btn-burial');
+    const btnCremation = document.getElementById('btn-cremation');
+    const btnCemOn = document.getElementById('btn-cemetery-on');
+    const btnCemOff = document.getElementById('btn-cemetery-off');
+    const stateSelect = document.getElementById('stateSelect');
+    const bodies = {
+      funeral: document.getElementById('bodyFuneral'),
+      transport: document.getElementById('bodyTransport'),
+      ceremony: document.getElementById('bodyCeremony'),
+      burial: document.getElementById('bodyBurial'),
+      cremation: document.getElementById('bodyCremation')
+    };
+    function renderStates(){
+      ALL_STATES.forEach(st => {
+        const opt=document.createElement('option'); opt.value=st;
+        const mult=STATE_MULTIPLIERS[st]||1.0;
+        opt.textContent=`${st} (${mult===1?'avg':mult===1.2?'higher':'lower'})`;
+        stateSelect.appendChild(opt);
+      });
+      stateSelect.value='Utah'; applyStateMultiplier();
+    }
+    function applyStateMultiplier(){
+      const sel=stateSelect.value; multiplier=STATE_MULTIPLIERS[sel]||1.0;
+      multiplierEl.textContent='×'+multiplier.toFixed(2); updateTotals();
+    }
+    function renderItems(){
+      Object.values(bodies).forEach(el=>el.innerHTML='');
+      ITEMS.forEach(item=>{
+        if(!appliesNow(item)) return;
+        if(item.isCemetery && !cemeteryOn) return;
+        const st=itemState.get(item.id);
+        const tdName=document.createElement('td'); tdName.textContent=item.label;
+        const tdAmt=document.createElement('td'); tdAmt.className='right';
+        const spanView=document.createElement('span'); spanView.className='amount-view'; spanView.textContent=fmtUSD(st.amount);
+        const editWrap=document.createElement('span'); editWrap.className='amount-edit';
+        const input=document.createElement('input'); input.type='number'; input.min='0'; input.step='50'; input.value=st.amount; input.className='amount-input';
+        const btnSave=document.createElement('button'); btnSave.className='link'; btnSave.textContent='Save';
+        const btnCancel=document.createElement('button'); btnCancel.className='link'; btnCancel.textContent='Cancel';
+        editWrap.appendChild(input); editWrap.appendChild(document.createTextNode(' ')); editWrap.appendChild(btnSave); editWrap.appendChild(document.createTextNode(' ')); editWrap.appendChild(btnCancel);
+        tdAmt.appendChild(spanView); tdAmt.appendChild(editWrap);
+        const tdActions=document.createElement('td'); tdActions.className='right';
+        const actions=document.createElement('div'); actions.className='row-actions';
+        const btnRemove=document.createElement('button'); btnRemove.className='link'; btnRemove.textContent=st.enabled?'Remove':'Add back';
+        const btnEdit=document.createElement('button'); btnEdit.className='link'; btnEdit.textContent='Edit amount';
+        actions.appendChild(btnRemove); actions.appendChild(btnEdit); tdActions.appendChild(actions);
+        const row=document.createElement('tr'); if(!st.enabled) row.classList.add('disabled');
+        row.appendChild(tdName); row.appendChild(tdAmt); row.appendChild(tdActions);
+        const tbody=bodies[item.group]; tbody.appendChild(row);
+
+        btnRemove.addEventListener('click',()=>{ st.enabled=!st.enabled; btnRemove.textContent=st.enabled?'Remove':'Add back'; row.classList.toggle('disabled',!st.enabled); updateTotals(); });
+        btnEdit.addEventListener('click',()=>{ spanView.style.display='none'; editWrap.style.display='inline'; input.focus(); });
+        btnSave.addEventListener('click',()=>{ const val=Number(input.value)||0; st.amount=val; spanView.textContent=fmtUSD(st.amount); spanView.style.display='inline'; editWrap.style.display='none'; updateTotals(); });
+        btnCancel.addEventListener('click',()=>{ input.value=st.amount; spanView.style.display='inline'; editWrap.style.display='none'; });
+      });
+      // Hide empty sections
+      Object.entries(bodies).forEach(([key,el])=>{
+        const section=document.getElementById('grp'+key.charAt(0).toUpperCase()+key.slice(1));
+        section.style.display = el.children.length ? '' : 'none';
+      });
+    }
+    function computeSubtotal(){
+      let sum=0; ITEMS.forEach(it=>{ const st=itemState.get(it.id); if(!st) return; if(!appliesNow(it)) return; if(it.isCemetery && !cemeteryOn) return; if(st.enabled) sum+=Number(st.amount)||0; }); return sum;
+    }
+    function updateTotals(){
+      const sub=computeSubtotal(); const total=sub*multiplier;
+      subtotalEl.textContent=fmtUSD(sub); grandEl.textContent=fmtUSD(total);
+      scenarioBadge.textContent = `${scenario==='burial'?'Traditional burial':'Traditional cremation'}${cemeteryOn?', cemetery on':', cemetery off'}`;
+    }
+    function setScenario(next){
+      scenario=next;
+      document.getElementById('btn-burial').setAttribute('aria-pressed', scenario==='burial'?'true':'false');
+      document.getElementById('btn-cremation').setAttribute('aria-pressed', scenario==='cremation'?'true':'false');
+      ITEMS.forEach(it=>{ const st=itemState.get(it.id); st.enabled=appliesNow(it)&&cemeteryOK(it); });
+      renderItems(); updateTotals();
+    }
+    function setCemetery(on){
+      cemeteryOn=on;
+      document.getElementById('btn-cemetery-on').setAttribute('aria-pressed', on?'true':'false');
+      document.getElementById('btn-cemetery-off').setAttribute('aria-pressed', on?'false':'true');
+      ITEMS.forEach(it=>{ const st=itemState.get(it.id); if(it.isCemetery){ st.enabled=on&&appliesNow(it);} });
+      renderItems(); updateTotals();
+    }
+    document.getElementById('btnPrint').addEventListener('click',()=>window.print());
+    document.getElementById('btnCSV').addEventListener('click',()=>{
+      const rows=[['Item','Amount (USD)','Included']];
+      ITEMS.forEach(it=>{ const st=itemState.get(it.id); if(!appliesNow(it)) return; if(it.isCemetery && !cemeteryOn) return; rows.push([it.label,(Number(st.amount)||0).toFixed(0), st.enabled?'Yes':'No']); });
+      rows.push(['Subtotal', computeSubtotal().toFixed(0), '']);
+      rows.push(['State multiplier', multiplier.toFixed(2), '']);
+      rows.push(['Total', (computeSubtotal()*multiplier).toFixed(0), '']);
+      const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+      const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='quietpath-funeral-estimate.csv'; a.click(); URL.revokeObjectURL(url);
+    });
+    document.getElementById('btnCustomize').addEventListener('click',()=>{ controlsSection.style.display=''; itemsSection.style.display=''; document.getElementById('btnCustomize').style.display='none'; });
+    document.getElementById('btnShowOptions').addEventListener('click',()=>{ controlsSection.style.display=''; document.getElementById('btnCustomize').style.display='none'; });
+    document.getElementById('btn-burial').addEventListener('click',()=>setScenario('burial'));
+    document.getElementById('btn-cremation').addEventListener('click',()=>setScenario('cremation'));
+    document.getElementById('btn-cemetery-on').addEventListener('click',()=>setCemetery(true));
+    document.getElementById('btn-cemetery-off').addEventListener('click',()=>setCemetery(false));
+    stateSelect.addEventListener('change', applyStateMultiplier);
+    function boot(){ initDefaults(); renderStates(); renderItems(); updateTotals(); }
+    boot();
+  </script>
+</body>
+</html>
