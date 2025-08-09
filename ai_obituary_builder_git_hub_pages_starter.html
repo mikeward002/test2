@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Obituary Builder • QuietPath</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f7f7fb;
+      --card: #ffffff;
+      --ink: #1f2a37;
+      --muted: #6b7280;
+      --brand: #5b7db6; /* dusty blue */
+      --accent: #9c7aa7; /* muted plum */
+      --sand: #e8dccb;  /* warm sand */
+      --ok: #0f766e;
+      --warn: #b45309;
+      --bad: #b91c1c;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; color: var(--ink); background: var(--bg); }
+    a { color: var(--brand); }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 0; }
+    .logo { font-weight: 700; letter-spacing: 0.2px; }
+    nav a { margin-left: 16px; text-decoration: none; color: var(--ink); opacity: 0.8; }
+    .hero { background: linear-gradient(180deg, #ffffff, #f6f7fb); border: 1px solid #eef0f6; padding: 28px; border-radius: var(--radius); box-shadow: 0 8px 30px rgba(0,0,0,0.05); }
+    h1 { margin: 0 0 4px; font-size: 28px; }
+    .sub { color: var(--muted); margin-bottom: 16px; }
+    .grid { display: grid; gap: 16px; grid-template-columns: 1.2fr 1fr; }
+    .card { background: var(--card); border: 1px solid #eef0f6; border-radius: var(--radius); padding: 16px; box-shadow: 0 4px 18px rgba(0,0,0,0.04); }
+    fieldset { border: none; padding: 0; margin: 0 0 12px; }
+    legend { font-weight: 600; margin-bottom: 8px; }
+    label { display: block; font-size: 14px; color: var(--muted); margin-top: 10px; }
+    input[type="text"], input[type="date"], input[type="number"], input[type="url"], textarea, select {
+      width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #e4e7ee; background: #fff; font-size: 14px;
+    }
+    textarea { min-height: 90px; }
+    .row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .help { font-size: 12px; color: var(--muted); }
+    .pill { display: inline-block; padding: 4px 8px; border-radius: 999px; background: #eef3ff; color: #3b5fb1; font-size: 12px; margin-right: 6px; }
+    .btn { appearance: none; border: 0; border-radius: 10px; padding: 10px 14px; font-weight: 600; cursor: pointer; }
+    .btn.primary { background: var(--brand); color: white; }
+    .btn.secondary { background: #eef2f7; color: #1f2937; }
+    .btn.ghost { background: transparent; color: var(--brand); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .stack { display: flex; gap: 8px; flex-wrap: wrap; }
+    .jsonbox { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 12px; background: #0b1220; color: #e5e7eb; padding: 12px; border-radius: 10px; overflow: auto; max-height: 260px; }
+    .output { white-space: pre-wrap; }
+    .badge { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: #eef2f7; color: #475569; }
+    .hr { height: 1px; background: #eef0f6; margin: 12px 0; }
+    .footer { color: var(--muted); font-size: 13px; text-align: center; padding: 24px 0; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">QuietPath</div>
+      <nav>
+        <a href="#">96-hour checklist</a>
+        <a href="#">AI Obituary Builder</a>
+        <a href="#">Funeral cost calculator</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>AI Obituary Builder</h1>
+      <p class="sub">Start from a template, enter only what you know, and generate a warm, accurate obituary. The draft will never invent facts. Anything you leave blank will be omitted.</p>
+      <div class="stack">
+        <span class="pill">No account required</span>
+        <span class="pill">Your data stays in your browser</span>
+        <span class="pill">Edit and export to Markdown</span>
+      </div>
+    </section>
+
+    <div class="hr"></div>
+
+    <section class="grid">
+      <!-- Left: Form -->
+      <div class="card">
+        <form id="obitForm">
+          <fieldset>
+            <legend>1. Template and length</legend>
+            <div class="row">
+              <label>Template
+                <select id="template">
+                  <option value="traditional">Traditional</option>
+                  <option value="religious">Religious</option>
+                  <option value="non_religious">Non‑religious</option>
+                  <option value="military">Military</option>
+                  <option value="short_notice">Short notice</option>
+                </select>
+              </label>
+              <label>Length
+                <select id="length">
+                  <option value="standard">Standard</option>
+                  <option value="short">Short</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>2. Person</legend>
+            <label>Full name* <input required id="full_name" type="text" /></label>
+            <div class="row3">
+              <label>Preferred name <input id="preferred_name" type="text" /></label>
+              <label>Pronouns <input id="pronouns" type="text" placeholder="she/her, he/him, they/them"/></label>
+              <label>Place of death <input id="place_of_death" type="text" /></label>
+            </div>
+            <div class="row3">
+              <label>Date of birth <input id="date_of_birth" type="date" /></label>
+              <label>Date of death <input id="date_of_death" type="date" /></label>
+              <label>Age <input id="age" type="number" min="0" /></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>3. Life</legend>
+            <div class="row">
+              <label>Birthplace <input id="birthplace" type="text" /></label>
+              <label>Upbringing <input id="upbringing" type="text" placeholder="Short phrase"/></label>
+            </div>
+            <label>Education (comma separated) <input id="education" type="text" placeholder="B.S., School; M.A., School"/></label>
+            <label>Career highlights (comma separated) <input id="career" type="text" placeholder="Role at Company; Volunteer role"/></label>
+            <label>Affiliations (comma separated) <input id="affiliations" type="text" placeholder="Clubs, organizations"/></label>
+            <label>Interests (comma separated) <input id="interests" type="text" placeholder="hobbies, passions"/></label>
+            <label>Faith <input id="faith" type="text" /></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>4. Family</legend>
+            <label>Predeceased (comma separated) <input id="predeceased" type="text" placeholder="spouse, parents, etc."/></label>
+            <label>Survived by (comma separated) <input id="survived_by" type="text" placeholder="spouse, children, siblings, etc."/></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>5. Services</legend>
+            <div class="row3">
+              <label>Viewing date <input id="viewing_date" type="date" /></label>
+              <label>Time <input id="viewing_time" type="text" placeholder="6:00–8:00 p.m."/></label>
+              <label>Location <input id="viewing_loc" type="text" /></label>
+            </div>
+            <div class="row3">
+              <label>Funeral date <input id="funeral_date" type="date" /></label>
+              <label>Time <input id="funeral_time" type="text" /></label>
+              <label>Location <input id="funeral_loc" type="text" /></label>
+            </div>
+            <div class="row3">
+              <label>Graveside date <input id="graveside_date" type="date" /></label>
+              <label>Time <input id="graveside_time" type="text" /></label>
+              <label>Location <input id="graveside_loc" type="text" /></label>
+            </div>
+            <div class="row">
+              <label>Livestream URL <input id="livestream_url" type="url" /></label>
+              <label>Officiant <input id="officiant" type="text" /></label>
+            </div>
+            <label>Reception (date, time, location) <input id="reception" type="text" placeholder="e.g., 2025‑08‑12, 12:30 p.m., Parish Hall"/></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>6. Memorials and notes</legend>
+            <div class="row">
+              <label>Flowers accepted?
+                <select id="flowers"><option value="">—</option><option value="true">Yes</option><option value="false">No</option></select>
+              </label>
+              <label>Donation charity name <input id="charity_name" type="text" /></label>
+            </div>
+            <div class="row">
+              <label>Donation URL <input id="charity_url" type="url" /></label>
+              <label>Donation notes <input id="charity_notes" type="text" /></label>
+            </div>
+            <label>Notes to include verbatim <textarea id="notes" placeholder="Any exact wording you want included" ></textarea></label>
+            <label>Acknowledgements (comma separated) <input id="acks" type="text" placeholder="caregivers, hospice"/></label>
+            <div class="row">
+              <label>Reading level
+                <select id="readability">
+                  <option value="grade7">Grade 7</option>
+                  <option value="grade9">Grade 9</option>
+                  <option value="grade11">Grade 11</option>
+                </select>
+              </label>
+              <label>Tone
+                <select id="tone">
+                  <option value="warm_neutral">Warm neutral</option>
+                  <option value="faith_forward">Faith forward</option>
+                  <option value="simple_plain">Simple plain</option>
+                </select>
+              </label>
+            </div>
+            <div style="margin-top:10px">
+              <label><input id="omit_cod" type="checkbox" checked /> Omit cause of death unless provided</label>
+            </div>
+            <div style="margin-top:10px">
+              <label><input id="confirm" type="checkbox" required /> I confirm the information is accurate to my knowledge</label>
+            </div>
+          </fieldset>
+
+          <div class="stack" style="margin-top:8px">
+            <button class="btn secondary" type="button" id="previewJsonBtn">3. Review JSON</button>
+            <button class="btn primary" type="button" id="composeBtn">4. Compose with template</button>
+            <button class="btn" type="button" id="composeAIBtn" title="Runs fully in your browser" style="background: var(--accent); color: white;">4. Compose with AI (WebLLM beta)</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Right: Preview and Output -->
+      <div class="card">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+          <h3 style="margin:0">Review</h3>
+          <span class="badge" id="statusBadge">Idle</span>
+        </div>
+        <p class="help">First check the JSON for accuracy. Then compose using a template or the AI model in your browser.</p>
+        <div class="jsonbox" id="jsonPreview" aria-live="polite">{}</div>
+        <div class="hr"></div>
+        <h3 style="margin:0 0 8px 0">Output</h3>
+        <div class="stack">
+          <button class="btn secondary" id="copyMdBtn" disabled>Copy Markdown</button>
+          <button class="btn ghost" id="downloadMdBtn" disabled>Download .md</button>
+        </div>
+        <div id="slug" class="help" style="margin-top:8px"></div>
+        <div class="output" id="obituaryOut"></div>
+        <div class="hr"></div>
+        <div>
+          <strong>Suggestions</strong>
+          <ul id="suggestions"></ul>
+        </div>
+      </div>
+    </section>
+
+    <p class="footer">Designed for compassion, clarity, and privacy. © QuietPath</p>
+  </div>
+
+  <script type="module">
+    // --- Minimal in‑browser data model and validators ---
+    function splitCSV(v){
+      if(!v) return null; const parts = v.split(/[;,]/).map(s=>s.trim()).filter(Boolean); return parts.length?parts:null;
+    }
+
+    function collectForm(){
+      const $ = id => document.getElementById(id).value.trim();
+      const chk = id => document.getElementById(id).checked;
+
+      const form = {
+        template: $("template") || "traditional",
+        length: $("length") || "standard",
+        person: {
+          full_name: $("full_name"),
+          preferred_name: $("preferred_name") || null,
+          pronouns: $("pronouns") || null,
+          date_of_birth: $("date_of_birth") || null,
+          date_of_death: $("date_of_death") || null,
+          age: $("age") ? Number($("age")) : null,
+          place_of_death: $("place_of_death") || null,
+        },
+        life: {
+          birthplace: $("birthplace") || null,
+          upbringing: $("upbringing") || null,
+          education: splitCSV($("education")),
+          career: splitCSV($("career")),
+          military_service: null,
+          affiliations: splitCSV($("affiliations")),
+          interests: splitCSV($("interests")),
+          faith: $("faith") || null,
+        },
+        family: {
+          predeceased: splitCSV($("predeceased")),
+          survived_by: splitCSV($("survived_by"))
+        },
+        services: {
+          viewing: ( $("viewing_date") || $("viewing_time") || $("viewing_loc") ) ? { date: $("viewing_date")||null, time: $("viewing_time")||null, location: $("viewing_loc")||null } : null,
+          funeral: ( $("funeral_date") || $("funeral_time") || $("funeral_loc") ) ? { date: $("funeral_date")||null, time: $("funeral_time")||null, location: $("funeral_loc")||null } : null,
+          graveside: ( $("graveside_date") || $("graveside_time") || $("graveside_loc") ) ? { date: $("graveside_date")||null, time: $("graveside_time")||null, location: $("graveside_loc")||null } : null,
+          livestream_url: $("livestream_url") || null,
+          officiant: $("officiant") || null,
+          reception: $("reception") ? { date: $("reception").split(",")[0]?.trim()||null, time: $("reception").split(",")[1]?.trim()||null, location: $("reception").split(",")[2]?.trim()||null } : null
+        },
+        memorials: {
+          flowers: document.getElementById("flowers").value === "" ? null : document.getElementById("flowers").value === "true",
+          donations: ( $("charity_name") || $("charity_url") || $("charity_notes") ) ? { charity_name: $("charity_name")||null, url: $("charity_url")||null, notes: $("charity_notes")||null } : null
+        },
+        notes: $("notes") || null,
+        omit_cause_of_death: chk("omit_cod"),
+        acknowledgements: splitCSV($("acks")),
+        style: { tone: $("tone") || "warm_neutral", readability: $("readability") || "grade7" },
+        confirm_accuracy: document.getElementById("confirm").checked
+      };
+      return form;
+    }
+
+    function validate(form){
+      const issues = [];
+      if(!form.person.full_name) issues.push("Full name is required");
+      if(!form.confirm_accuracy) issues.push("Confirm accuracy checkbox must be checked");
+      if(form.person.age != null && (!Number.isInteger(form.person.age) || form.person.age < 0)) issues.push("Age must be a non‑negative integer");
+      if(form.template === "short_notice" && form.length !== "short") issues.push("Short notice template requires length set to short");
+      // Optional rough age check if both dates present
+      try {
+        if(form.person.date_of_birth && form.person.date_of_death && form.person.age != null){
+          const dob = new Date(form.person.date_of_birth);
+          const dod = new Date(form.person.date_of_death);
+          const years = Math.floor((dod - dob) / (365.25*24*3600*1000));
+          if(Math.abs(years - form.person.age) > 2) issues.push("Age seems inconsistent with dates");
+        }
+      } catch(e) { /* ignore */ }
+      return issues;
+    }
+
+    // --- Template composer (no AI) so everything works on GitHub Pages immediately ---
+    function composeTemplate(form){
+      const name = form.person.full_name;
+      const pref = form.person.preferred_name ? `, known to many as ${form.person.preferred_name}` : "";
+      const dob = form.person.date_of_birth ? new Date(form.person.date_of_birth).toLocaleDateString() : null;
+      const dod = form.person.date_of_death ? new Date(form.person.date_of_death).toLocaleDateString() : null;
+      const age = form.person.age != null ? `, ${form.person.age}` : "";
+      const birthplace = form.life.birthplace ? `born in ${form.life.birthplace}` : null;
+
+      const survived = form.family.survived_by?.length ? `Survived by ${form.family.survived_by.join(", ")}.` : "";
+      const predec = form.family.predeceased?.length ? `Predeceased by ${form.family.predeceased.join(", ")}.` : "";
+
+      const edu = form.life.education?.length ? `Education: ${form.life.education.join("; ")}.` : "";
+      const car = form.life.career?.length ? `Career: ${form.life.career.join("; ")}.` : "";
+      const aff = form.life.affiliations?.length ? `Affiliations: ${form.life.affiliations.join(", ")}.` : "";
+      const intx = form.life.interests?.length ? `Interests: ${form.life.interests.join(", ")}.` : "";
+      const faith = form.life.faith ? `Faith: ${form.life.faith}.` : "";
+
+      const view = form.services.viewing && (form.services.viewing.date || form.services.viewing.time || form.services.viewing.location)
+        ? `Viewing: ${[form.services.viewing.date, form.services.viewing.time, form.services.viewing.location].filter(Boolean).join(", ")}.` : "";
+      const fun = form.services.funeral && (form.services.funeral.date || form.services.funeral.time || form.services.funeral.location)
+        ? `Funeral: ${[form.services.funeral.date, form.services.funeral.time, form.services.funeral.location].filter(Boolean).join(", ")}.` : "";
+      const grav = form.services.graveside && (form.services.graveside.date || form.services.graveside.time || form.services.graveside.location)
+        ? `Graveside: ${[form.services.graveside.date, form.services.graveside.time, form.services.graveside.location].filter(Boolean).join(", ")}.` : "";
+      const live = form.services.livestream_url ? `Livestream: ${form.services.livestream_url}.` : "";
+      const offi = form.services.officiant ? `Officiant: ${form.services.officiant}.` : "";
+      const recep = form.services.reception && (form.services.reception.date || form.services.reception.time || form.services.reception.location)
+        ? `Reception: ${[form.services.reception.date, form.services.reception.time, form.services.reception.location].filter(Boolean).join(", ")}.` : "";
+
+      const mem = form.memorials?.donations?.charity_name || form.memorials?.flowers != null
+        ? `${form.memorials.flowers===true?"Flowers welcome.":form.memorials.flowers===false?"Please, no flowers.":""} ${form.memorials.donations?`Donations: ${[form.memorials.donations.charity_name, form.memorials.donations.url, form.memorials.donations.notes].filter(Boolean).join(", ")}.`:""}`.trim()
+        : "";
+
+      const notes = form.notes ? form.notes : "";
+      const acks = form.acknowledgements?.length ? `The family wishes to thank ${form.acknowledgements.join(", ")}.` : "";
+
+      const lines = [];
+      lines.push(`# ${name}${age}`);
+      const dates = (dob || dod) ? ` (${dob||""} – ${dod||""})` : "";
+      lines.push(``);
+      lines.push(`${name}${pref}${dates}${birthplace?`, ${birthplace}`:``}.`);
+      if (edu) lines.push(edu);
+      if (car) lines.push(car);
+      if (aff) lines.push(aff);
+      if (intx) lines.push(intx);
+      if (faith) lines.push(faith);
+      if (survived) lines.push(survived);
+      if (predec) lines.push(predec);
+      if (view) lines.push(view);
+      if (fun) lines.push(fun);
+      if (grav) lines.push(grav);
+      if (live) lines.push(live);
+      if (offi) lines.push(offi);
+      if (recep) lines.push(recep);
+      if (mem) lines.push(mem);
+      if (notes) lines.push(notes);
+      if (acks) lines.push(acks);
+
+      return {
+        slug: `${name}${form.person.age!=null?`, ${form.person.age}`:``}`,
+        obituary_markdown: lines.join("\n\n").trim(),
+        used_fields_json: form,
+        suggestions: buildSuggestions(form)
+      };
+    }
+
+    function buildSuggestions(form){
+      const s = [];
+      if(!form.life.education?.length) s.push("Add education details");
+      if(!form.life.career?.length) s.push("List one or two career highlights");
+      if(!form.family.survived_by?.length) s.push("Add a survived by list");
+      if(!form.services.funeral && !form.services.viewing && !form.services.graveside) s.push("Add service details if available");
+      if(form.memorials.flowers==null && !form.memorials.donations) s.push("Specify flowers or donations preference");
+      if(!form.life.interests?.length) s.push("Include a few interests or hobbies");
+      return s;
+    }
+
+    // --- Optional: WebLLM wiring (runs fully in the browser, no API key) ---
+    // To enable, uncomment the dynamic import and the generateWithAI function call below.
+    let engine = null; let webllmReady = false;
+    async function initWebLLM(){
+      const status = document.getElementById('statusBadge');
+      try {
+        status.textContent = 'Loading model…';
+        const { CreateMLCEngine } = await import('https://esm.run/@mlc-ai/web-llm');
+        engine = await CreateMLCEngine({ model: 'Llama-3.1-8B-Instruct-q4f32_1-MLC' });
+        webllmReady = true;
+        status.textContent = 'AI ready';
+      } catch(err){
+        console.error(err);
+        status.textContent = 'AI unavailable';
+      }
+    }
+
+    async function generateWithAI(form){
+      if(!webllmReady) { throw new Error('AI not initialized'); }
+      const system = `You are a careful obituary composer. You write only from provided facts. You must not infer, speculate, or fabricate details. If a field is missing, omit it.`;
+      const developer = `Return a single JSON object with keys: slug, obituary_markdown, used_fields_json, suggestions.`;
+      const user = `Task: Validate and generate an obituary strictly from the following JSON. Do not add information. Input JSON:<<<\n${JSON.stringify(form)}\n>>>`;
+
+      // Minimal chat call. API shape may change with WebLLM versions.
+      const res = await engine.chat.completions.create({
+        messages: [
+          { role: 'system', content: system },
+          { role: 'system', content: developer },
+          { role: 'user', content: user }
+        ],
+        temperature: 0,
+        max_tokens: 900
+      });
+      const text = res.choices?.[0]?.message?.content || '';
+      // Try to parse JSON body from model text
+      const match = text.match(/\{[\s\S]*\}$/);
+      if(!match) throw new Error('Model returned unexpected format');
+      return JSON.parse(match[0]);
+    }
+
+    // --- UI wiring ---
+    const jsonBox = document.getElementById('jsonPreview');
+    const out = document.getElementById('obituaryOut');
+    const slug = document.getElementById('slug');
+    const sugg = document.getElementById('suggestions');
+    const statusBadge = document.getElementById('statusBadge');
+
+    document.getElementById('previewJsonBtn').addEventListener('click', ()=>{
+      const form = collectForm();
+      const issues = validate(form);
+      jsonBox.textContent = JSON.stringify({ form, validation_issues: issues }, null, 2);
+      statusBadge.textContent = issues.length? 'Needs fixes' : 'Looks good';
+      statusBadge.style.background = issues.length? '#fff7ed' : '#ecfdf5';
+      statusBadge.style.color = issues.length? '#9a3412' : '#065f46';
+    });
+
+    function showResult(result){
+      slug.textContent = result.slug ? `Slug: ${result.slug}` : '';
+      out.textContent = result.obituary_markdown || '';
+      sugg.innerHTML = '';
+      (result.suggestions||[]).forEach(x=>{
+        const li = document.createElement('li'); li.textContent = x; sugg.appendChild(li);
+      });
+      document.getElementById('copyMdBtn').disabled = !result.obituary_markdown;
+      document.getElementById('downloadMdBtn').disabled = !result.obituary_markdown;
+    }
+
+    document.getElementById('composeBtn').addEventListener('click', ()=>{
+      const form = collectForm();
+      const issues = validate(form);
+      if(issues.length){
+        showResult({ slug: null, obituary_markdown: null, used_fields_json: null, suggestions: issues });
+        return;
+      }
+      const result = composeTemplate(form);
+      showResult(result);
+    });
+
+    document.getElementById('composeAIBtn').addEventListener('click', async ()=>{
+      const form = collectForm();
+      const issues = validate(form);
+      if(issues.length){ showResult({ slug:null, obituary_markdown:null, used_fields_json:null, suggestions: issues }); return; }
+      statusBadge.textContent = 'Thinking…';
+      try {
+        if(!webllmReady) await initWebLLM();
+        const result = await generateWithAI(form);
+        showResult(result);
+        statusBadge.textContent = 'Done';
+      } catch(err){
+        console.error(err);
+        statusBadge.textContent = 'AI failed';
+        showResult({ slug:null, obituary_markdown:null, used_fields_json:null, suggestions:[ 'AI could not run in this browser. Use the template composer or try a different device.' ]});
+      }
+    });
+
+    document.getElementById('copyMdBtn').addEventListener('click', async ()=>{
+      const md = document.getElementById('obituaryOut').textContent;
+      if(!md) return; await navigator.clipboard.writeText(md);
+      document.getElementById('copyMdBtn').textContent = 'Copied';
+      setTimeout(()=> document.getElementById('copyMdBtn').textContent = 'Copy Markdown', 1200);
+    });
+
+    document.getElementById('downloadMdBtn').addEventListener('click', ()=>{
+      const md = document.getElementById('obituaryOut').textContent; if(!md) return;
+      const blob = new Blob([md], {type:'text/markdown'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'obituary.md'; a.click();
+      URL.revokeObjectURL(a.href);
+    });
+  </script>
+</body>
+</html>
