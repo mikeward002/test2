@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Funeral Cost Calculator</title>
+  <style>
+    /* ---------- Base styles (high contrast, readable sizes) ---------- */
+    :root{
+      --bg:#ffffff;
+      --fg:#111111;
+      --muted:#555555;
+      --accent:#1a73e8;
+      --border:#e5e7eb;
+      --card:#f8fafc;
+      --focus:#ffae00;
+    }
+    html, body{
+      margin:0;
+      padding:0;
+      background:var(--bg);
+      color:var(--fg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      line-height:1.5;
+      font-size:16px; /* 14–16px minimum; using 16 for legibility */
+    }
+    .container{
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1{
+      margin: 0 0 8px;
+      font-size: 1.75rem;
+    }
+    p.lede{
+      margin: 0 0 20px;
+      color: var(--muted);
+    }
+    .notice{
+      background: var(--card);
+      border:1px solid var(--border);
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin: 12px 0 24px;
+    }
+    /* Cards / layout */
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:16px;
+    }
+    @media (min-width: 840px){
+      .grid{
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .card{
+      background: #fff;
+      border:1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .section-title{
+      font-weight: 700;
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+    }
+    /* Controls */
+    .controls{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
+    .control{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:10px;
+      border-bottom:1px dashed var(--border);
+      padding-bottom:10px;
+    }
+    .control:last-child{ border-bottom:none; }
+    label{ font-weight:600; }
+    select, input[type="number"]{
+      font-size:1rem;
+      padding:8px 10px;
+      border:1px solid var(--border);
+      border-radius:8px;
+      width: 220px;
+      max-width:100%;
+      background:#fff;
+      color:var(--fg);
+    }
+    .toggle-group{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .toggle{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      cursor:pointer;
+      user-select:none;
+      background:#fff;
+    }
+    .toggle input{ display:none; }
+    .toggle[aria-pressed="true"]{
+      border-color: var(--accent);
+      box-shadow: inset 0 0 0 1px var(--accent);
+    }
+    .help{
+      color:var(--muted);
+      font-size:0.95rem;
+      margin-top:-6px;
+    }
+    /* Line items table */
+    table{
+      width:100%;
+      border-collapse: collapse;
+      border-spacing: 0;
+      font-size:1rem;
+    }
+    thead th{
+      text-align:left;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 10px;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+    tbody td{
+      border-bottom:1px solid var(--border);
+      padding: 8px 10px;
+      vertical-align: middle;
+    }
+    tbody tr.disabled{
+      color:#9aa0a6;
+      background:#fafafa;
+    }
+    .item-name{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .item-note{
+      font-size:0.9rem;
+      color: var(--muted);
+    }
+    .right{
+      text-align:right;
+    }
+    .checkbox{
+      width:18px; height:18px;
+    }
+    /* Totals */
+    .totals{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top: 8px;
+    }
+    .total-line{
+      display:flex;
+      justify-content:space-between;
+      font-size:1.1rem;
+    }
+    .grand{
+      font-weight:800;
+      font-size:1.3rem;
+      border-top:2px solid var(--border);
+      padding-top:10px;
+    }
+    .grand .value{
+      color: var(--accent);
+    }
+    .pill{
+      display:inline-block;
+      background: var(--card);
+      border:1px solid var(--border);
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size:0.9rem;
+      color: var(--muted);
+    }
+    /* Footer small print */
+    .small{
+      color: var(--muted);
+      font-size:0.9rem;
+    }
+    /* Focus outlines for accessibility */
+    :focus{
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Funeral Cost Calculator</h1>
+      <p class="lede">Start with a sample budget, then tweak details to match your needs.</p>
+      <div class="notice" role="note">
+        <strong>Note:</strong> These estimates are based on national averages from the National Funeral Directors Association and other public sources. Your actual costs may vary.
+      </div>
+    </header>
+
+    <!-- Controls / scenarios -->
+    <section class="grid" aria-label="Calculator controls">
+      <div class="card" aria-labelledby="scenarioTitle">
+        <h2 id="scenarioTitle" class="section-title">Scenario</h2>
+        <div class="controls">
+          <!-- Scenario toggle -->
+          <div class="control">
+            <label class="pill" id="scenarioLabel">Default: Traditional burial with service (cemetery costs ON)</label>
+            <div class="toggle-group" role="group" aria-labelledby="scenarioLabel">
+              <button class="toggle" id="btn-burial" aria-pressed="true">Traditional Burial</button>
+              <button class="toggle" id="btn-cremation" aria-pressed="false">Traditional Cremation</button>
+            </div>
+          </div>
+
+          <!-- Cemetery costs master -->
+          <div class="control">
+            <label for="cemeteryToggle">Cemetery costs</label>
+            <div class="toggle-group">
+              <button class="toggle" id="btn-cemetery-on" aria-pressed="true">On</button>
+              <button class="toggle" id="btn-cemetery-off" aria-pressed="false">Off</button>
+            </div>
+            <div class="help">When ON, includes plot, opening/closing, headstone/marker, and (for burial) vault.</div>
+          </div>
+
+          <!-- State multiplier -->
+          <div class="control">
+            <label for="stateMultiplier">State cost level</label>
+            <select id="stateMultiplier" aria-label="State cost multiplier">
+              <option value="1.0" selected>Average (U.S. baseline ×1.00)</option>
+              <option value="0.8">Lower-cost state (approx. ×0.80)</option>
+              <option value="1.2">Higher-cost state (approx. ×1.20)</option>
+            </select>
+            <div class="help">Applies ±20% adjustment to all line items.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Totals side card -->
+      <div class="card" aria-labelledby="totalsTitle">
+        <h2 id="totalsTitle" class="section-title">Your Estimate</h2>
+        <div class="totals" aria-live="polite" aria-atomic="true">
+          <div class="total-line"><span>Items Subtotal</span><span class="value" id="subtotal">$0</span></div>
+          <div class="total-line"><span>State Multiplier</span><span class="value" id="multiplier">×1.00</span></div>
+          <div class="total-line grand"><span>Total Estimate</span><span class="value" id="grand">$0</span></div>
+          <div class="small">Totals update automatically as you change options or edit any line.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Line items -->
+    <section class="card" style="margin-top:16px;" aria-labelledby="itemsTitle">
+      <h2 id="itemsTitle" class="section-title">Itemized Costs (editable)</h2>
+      <div class="small" style="margin-bottom:10px;">Uncheck any items you do not need. Adjust amounts if your local quotes differ.</div>
+      <div class="table-wrap" style="max-height: 480px; overflow:auto; border:1px solid var(--border); border-radius:10px;">
+        <table role="table" aria-describedby="itemsTitle">
+          <thead>
+            <tr role="row">
+              <th scope="col">Include</th>
+              <th scope="col">Item</th>
+              <th scope="col" class="right">Amount (USD)</th>
+            </tr>
+          </thead>
+          <tbody id="itemsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="small" style="margin-top:16px;">
+      <p>Tip: Save this page to your computer if you want a personal copy. All calculations run in your browser.</p>
+    </footer>
+  </div>
+
+  <script>
+    /* ================================================================
+       Funeral Cost Calculator
+       - Single-file HTML+CSS+JS
+       - Default: Traditional burial, cemetery ON
+       - Second scenario: Traditional cremation (toggleable)
+       - State multiplier dropdown: 0.8, 1.0, 1.2
+       - Live total updates as inputs change
+       - Accessible, mobile-friendly, commented for future edits
+       ================================================================ */
+
+    // ---------- Data model: line items and defaults ----------
+    // "appliesTo": 'both' | 'burial' | 'cremation'
+    // "isCemetery": groups the cemetery-related items for the master toggle
+    const LINE_ITEMS = [
+      { id:'basic_services', label:'Basic services of funeral director/staff', base:2300, appliesTo:'both', isCemetery:false },
+      { id:'transfer', label:'Transfer of remains', base:350, appliesTo:'both', isCemetery:false },
+      { id:'embalming', label:'Embalming', base:750, appliesTo:'burial', isCemetery:false },
+      { id:'viewing', label:'Viewing / Visitation', base:450, appliesTo:'both', isCemetery:false },
+      { id:'ceremony', label:'Funeral ceremony', base:500, appliesTo:'both', isCemetery:false },
+      { id:'hearse', label:'Hearse', base:350, appliesTo:'burial', isCemetery:false },
+      { id:'service_car', label:'Service car / van', base:150, appliesTo:'both', isCemetery:false },
+      { id:'metal_casket', label:'Metal casket', base:2500, appliesTo:'burial', isCemetery:false },
+      { id:'vault', label:'Vault', base:1500, appliesTo:'burial', isCemetery:true },
+      { id:'plot', label:'Cemetery plot', base:2000, appliesTo:'both', isCemetery:true },
+      { id:'opening', label:'Opening / Closing grave', base:1200, appliesTo:'both', isCemetery:true },
+      { id:'headstone', label:'Headstone / marker', base:2000, appliesTo:'both', isCemetery:true },
+      { id:'cremation_fee', label:'Cremation fee (if applicable)', base:350, appliesTo:'cremation', isCemetery:false },
+      { id:'urn', label:'Urn (if applicable)', base:250, appliesTo:'cremation', isCemetery:false },
+    ];
+
+    // State
+    let scenario = 'burial';       // 'burial' or 'cremation'
+    let cemeteryOn = true;         // master toggle
+    let multiplier = 1.0;          // state multiplier
+    const itemState = new Map();   // id -> { enabled:boolean, amount:number }
+
+    // Initialize default selection:
+    // - Include all items that apply to the scenario
+    // - Cemetery ON means cemetery items enabled too
+    function initDefaults(){
+      itemState.clear();
+      LINE_ITEMS.forEach(item => {
+        const applies = item.appliesTo === 'both' || item.appliesTo === scenario;
+        const cemeteryOK = item.isCemetery ? cemeteryOn : true;
+        const enabled = applies && cemeteryOK;
+        itemState.set(item.id, { enabled, amount: item.base });
+      });
+    }
+
+    // ---------- DOM helpers ----------
+    const itemsBody = document.getElementById('itemsBody');
+    const subtotalEl = document.getElementById('subtotal');
+    const grandEl = document.getElementById('grand');
+    const multiplierEl = document.getElementById('multiplier');
+    const btnBurial = document.getElementById('btn-burial');
+    const btnCremation = document.getElementById('btn-cremation');
+    const btnCemOn = document.getElementById('btn-cemetery-on');
+    const btnCemOff = document.getElementById('btn-cemetery-off');
+    const stateMultiplier = document.getElementById('stateMultiplier');
+
+    // Format currency
+    const fmtUSD = (n)=> n.toLocaleString(undefined, { style:'currency', currency:'USD', maximumFractionDigits:0 });
+
+    // Build the items table rows
+    function renderItems(){
+      itemsBody.innerHTML = '';
+      LINE_ITEMS.forEach(item => {
+        const state = itemState.get(item.id);
+        const applies = item.appliesTo === 'both' || item.appliesTo === scenario;
+        const cemeteryOK = item.isCemetery ? cemeteryOn : true;
+        const visible = applies && (cemeteryOK || item.isCemetery === false);
+
+        // Show rows that apply to the current scenario. If cemetery is OFF,
+        // hide cemetery rows entirely (keeps UI uncluttered). If you prefer,
+        // you could show them disabled instead.
+        if(!visible){ return; }
+
+        const row = document.createElement('tr');
+        if(!state.enabled){ row.classList.add('disabled'); }
+
+        // Include checkbox
+        const tdCheck = document.createElement('td');
+        tdCheck.className = 'right';
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.className = 'checkbox';
+        cb.checked = state.enabled;
+        cb.setAttribute('aria-label', 'Include ' + item.label);
+        cb.addEventListener('change', () => {
+          state.enabled = cb.checked;
+          if(cb.checked) row.classList.remove('disabled'); else row.classList.add('disabled');
+          updateTotals();
+        });
+        tdCheck.appendChild(cb);
+
+        // Label + notes
+        const tdName = document.createElement('td');
+        const wrap = document.createElement('div');
+        wrap.className = 'item-name';
+        const title = document.createElement('div');
+        title.textContent = item.label;
+        const note = document.createElement('div');
+        note.className = 'item-note';
+        note.textContent = item.appliesTo === 'burial' ? '(Burial)' :
+                           item.appliesTo === 'cremation' ? '(Cremation)' : '';
+        wrap.appendChild(title);
+        if(note.textContent) wrap.appendChild(note);
+        tdName.appendChild(wrap);
+
+        // Amount input
+        const tdAmt = document.createElement('td');
+        tdAmt.className = 'right';
+        const inp = document.createElement('input');
+        inp.type = 'number';
+        inp.min = '0';
+        inp.step = '50';
+        inp.value = state.amount;
+        inp.style.width = '140px';
+        inp.setAttribute('inputmode','decimal');
+        inp.addEventListener('input', () => {
+          const num = Number(inp.value);
+          state.amount = isNaN(num) ? 0 : num;
+          updateTotals();
+        });
+        tdAmt.appendChild(inp);
+
+        row.appendChild(tdCheck);
+        row.appendChild(tdName);
+        row.appendChild(tdAmt);
+        itemsBody.appendChild(row);
+      });
+    }
+
+    // Compute totals
+    function computeSubtotal(){
+      let sum = 0;
+      LINE_ITEMS.forEach(item => {
+        const st = itemState.get(item.id);
+        // Only count items that are enabled and currently visible/applicable
+        const applies = item.appliesTo === 'both' || item.appliesTo === scenario;
+        const cemeteryOK = item.isCemetery ? cemeteryOn : true;
+        const visible = applies && (cemeteryOK || item.isCemetery === false);
+        if(st && st.enabled && visible){
+          sum += Number(st.amount) || 0;
+        }
+      });
+      return sum;
+    }
+
+    function updateTotals(){
+      const sub = computeSubtotal();
+      const total = sub * multiplier;
+      subtotalEl.textContent = fmtUSD(sub);
+      grandEl.textContent = fmtUSD(total);
+      multiplierEl.textContent = '×' + multiplier.toFixed(2);
+    }
+
+    // ---------- Event wiring ----------
+    function setScenario(next){
+      scenario = next;
+      // Embalming is burial only; cremation fee + urn are cremation only.
+      // Reset enabled flags to match the scenario while preserving edited amounts.
+      LINE_ITEMS.forEach(item => {
+        const st = itemState.get(item.id);
+        const applies = item.appliesTo === 'both' || item.appliesTo === scenario;
+        const cemeteryOK = item.isCemetery ? cemeteryOn : true;
+        st.enabled = applies && cemeteryOK;
+      });
+      // Toggle button aria states
+      btnBurial.setAttribute('aria-pressed', scenario === 'burial' ? 'true' : 'false');
+      btnCremation.setAttribute('aria-pressed', scenario === 'cremation' ? 'true' : 'false');
+      renderItems();
+      updateTotals();
+    }
+
+    function setCemetery(on){
+      cemeteryOn = on;
+      btnCemOn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btnCemOff.setAttribute('aria-pressed', on ? 'false' : 'true');
+      // Update enabled visibility for cemetery-group items
+      LINE_ITEMS.forEach(item => {
+        if(item.isCemetery){
+          const st = itemState.get(item.id);
+          const applies = item.appliesTo === 'both' || item.appliesTo === scenario;
+          st.enabled = on && applies; // enabled only if master is ON and item applies
+        }
+      });
+      renderItems();
+      updateTotals();
+    }
+
+    // Hook up controls
+    btnBurial.addEventListener('click', () => setScenario('burial'));
+    btnCremation.addEventListener('click', () => setScenario('cremation'));
+    btnCemOn.addEventListener('click', () => setCemetery(true));
+    btnCemOff.addEventListener('click', () => setCemetery(false));
+    stateMultiplier.addEventListener('change', () => {
+      multiplier = Number(stateMultiplier.value);
+      updateTotals();
+    });
+
+    // ---------- Initialize ----------
+    initDefaults();
+    renderItems();
+    updateTotals();
+  </script>
+</body>
+</html>
