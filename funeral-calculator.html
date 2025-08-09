@@ -1,47 +1,38 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>QuietPath • Funeral Cost Calculator (v21e)</title>
+<title>QuietPath • Funeral Cost Calculator (v21e-linked)</title>
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&family=Raleway:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="quietpath-styles.css">
 <style>
-/* Page-specific tweaks (kept tiny so you can reuse quietpath-styles.css elsewhere) */
+/* minimal page-specific styles (most is in quietpath-styles.css) */
 h1{font-family:Raleway,Lato,sans-serif;font-weight:800;color:var(--blue);font-size:clamp(1.6rem,3vw,2.2rem);margin:8px 0 8px;}
 .lede{color:var(--muted);max-width:72ch;}
-/* controls */
 .controls .row{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--border);flex-wrap:wrap;}
 .controls .row:last-child{border-bottom:none;}
 label.muted{color:var(--muted);min-width:150px;}
-select{font-size:16px;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--fg);} /* 16px to avoid iOS zoom */
-#stateSelect{font-size:.9rem;color:var(--muted);} /* visible text smaller & warmer */
+select{font-size:16px;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--fg);}
+#stateSelect{font-size:.9rem;color:var(--muted);}
 .togglebar{display:flex;gap:8px;flex-wrap:wrap;}
 .pill{border:1px solid var(--border);background:#fff;border-radius:999px;padding:8px 12px;cursor:pointer;}
 .pill[aria-pressed="true"]{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue);color:var(--blue);font-weight:700;}
-/* Groups & subtotals */
 .group{margin-top:12px;border-top:1px solid var(--border);padding-top:10px;}
 .group h3{display:flex;justify-content:space-between;align-items:baseline;font-family:Raleway,Lato,sans-serif;color:var(--blue);font-size:1.05rem;margin:0 0 8px;}
 .group h3 .subtotal{font-weight:700;}
-/* Disabled rows shown only when expanded */
 tr.row-disabled td.col-amt .amount{color:#9aa0a6!important;text-decoration:line-through!important;}
 tr.row-disabled td.col-item{color:#9aa0a6;}
-/* "See more options" link */
-.moreline{margin:8px 0 0; text-align:right;}
+.moreline{margin:8px 0 0;text-align:right;}
 .moreline .btn.linkish{color:var(--muted);}
 .moreline .btn.linkish:hover{color:var(--blue);text-decoration:underline;}
-/* Summary rail */
 .summary{display:grid;gap:10px;}
 .bucket{display:flex;justify-content:space-between;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#fafafa;}
 .bucket .name{font-weight:600;}
 .bucket .amt{font-weight:700;}
 .grand{display:flex;justify-content:space-between;padding:12px;border-top:2px solid var(--border);font-weight:800;font-size:1.2rem;color:var(--blue);}
-/* Notes placement */
-.notes-desktop{display:none;}
-@media(min-width:1100px){.notes-desktop{display:block;margin-top:10px;}}
-.bottom-notes{display:none;}
-@media(max-width:999px){.bottom-notes{display:block;margin:72px 0 16px;}}
+.notes-desktop{display:none;} @media(min-width:1100px){.notes-desktop{display:block;margin-top:10px;}}
+.bottom-notes{display:none;} @media(max-width:999px){.bottom-notes{display:block;margin:72px 0 16px;}}
 </style>
 </head>
 <body>
@@ -73,7 +64,6 @@ tr.row-disabled td.col-item{color:#9aa0a6;}
         <div class="grand" style="margin-bottom:8px;"><span>Total</span><span id="grandTotal">$0</span></div>
         <div id="summary" class="summary" style="margin-top:10px;"></div>
       </section>
-      <!-- Notes on desktop under the rail -->
       <section class="notes-desktop">
         <div class="card">
           <p class="small">Most Americans choose cremation (~62%), so we start with a cremation memorial by default.</p>
@@ -185,7 +175,6 @@ tr.row-disabled td.col-item{color:#9aa0a6;}
         </div>
       </section>
 
-      <!-- Bottom notes (mobile only) -->
       <section class="bottom-notes">
         <div class="card">
           <p class="small">Most Americans choose cremation (~62%), so we start with a cremation memorial by default.</p>
@@ -235,18 +224,16 @@ window.addEventListener('resize', ()=>{ clearTimeout(window._menuT); window._men
 syncMenu();
 
 // ----- Data -----
+// Multipliers for a few known high/low-cost states; all others default to 1.0
 const STATE_MULT={"California":1.2,"New York":1.2,"Massachusetts":1.2,"Connecticut":1.2,"New Jersey":1.2,"District of Columbia":1.2,"Washington":1.2,"Oregon":1.2,"Hawaii":1.2,"Alaska":1.2,"Maryland":1.2,"Alabama":0.8,"Arkansas":0.8,"Mississippi":0.8,"Oklahoma":0.8,"Kentucky":0.8,"West Virginia":0.8,"Louisiana":0.8,"Tennessee":0.8,"Missouri":0.8,"New Mexico":0.8,"South Carolina":0.8,"Idaho":0.8};
-const ALL_STATES=["National average","Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","District of Columbia","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
+
+// Build a complete list of states safely (no long inline array that might get truncated during edits)
+const ALL_STATES = ["National average"].concat("Alabama,Alaska,Arizona,Arkansas,California,Colorado,Connecticut,Delaware,District of Columbia,Florida,Georgia,Hawaii,Idaho,Illinois,Indiana,Iowa,Kansas,Kentucky,Louisiana,Maine,Maryland,Massachusetts,Michigan,Minnesota,Mississippi,Missouri,Montana,Nebraska,Nevada,New Hampshire,New Jersey,New Mexico,New York,North Carolina,North Dakota,Ohio,Oklahoma,Oregon,Pennsylvania,Rhode Island,South Carolina,South Dakota,Tennessee,Texas,Utah,Vermont,Virginia,Washington,West Virginia,Wisconsin,Wyoming".split(","));
+
 const GROUPS=["funeral","transport","ceremony","burial","cremation"];
 
 // Optional priority (most common first)
-const OPTIONAL_ORDER = {
-  ceremony:["flowers","programs","obituary","honorarium","catering"],
-  burial:["liner","headstone","plot","opening","vault"],
-  funeral:["refrigeration","presentation"],
-  transport:[],
-  cremation:[]
-};
+const OPTIONAL_ORDER = {ceremony:["flowers","programs","obituary","honorarium","catering"],burial:["liner","headstone","plot","opening","vault"],funeral:["refrigeration","presentation"],transport:[],cremation:[]};
 
 const ITEMS=[
   {id:"basic_services",label:"Basic services of funeral director and staff",base:2300,group:"funeral",applies:"both"},
@@ -263,14 +250,12 @@ const ITEMS=[
   {id:"headstone",label:"Headstone / marker",base:2000,group:"burial",applies:"both",isCemetery:true},
   {id:"cremation_fee",label:"Cremation fee",base:350,group:"cremation",applies:"cremation"},
   {id:"urn",label:"Urn",base:250,group:"cremation",applies:"cremation"},
-  // Optional add-ons
   {id:"flowers",label:"Flowers",base:150,group:"ceremony",applies:"both",optional:true,enabled:false},
   {id:"programs",label:"Printed programs / memorial cards",base:180,group:"ceremony",applies:"both",optional:true,enabled:false},
   {id:"obituary",label:"Obituary / announcement fees",base:100,group:"ceremony",applies:"both",optional:true,enabled:false},
   {id:"honorarium",label:"Clergy / celebrant honorarium",base:200,group:"ceremony",applies:"both",optional:true,enabled:false},
   {id:"catering",label:"Family gathering / catering",base:300,group:"ceremony",applies:"both",optional:true,enabled:false},
   {id:"liner",label:"Grave liner (if not using vault)",base:900,group:"burial",applies:"burial",optional:true,enabled:false},
-  // Open-casket related
   {id:"presentation",label:"Presentation prep (dressing/cosmetics)",base:200,group:"funeral",applies:"burial",optional:true,enabled:false},
   {id:"refrigeration",label:"Refrigeration (per day)",base:100,group:"funeral",applies:"both",optional:true,enabled:false,qtyFactor:true,qty:1}
 ];
@@ -319,17 +304,14 @@ function renderGroup(group){
     (st.enabled ? enabled : disabled).push(it);
   });
 
-  // enabled rows
   enabled.forEach(it => tbody.appendChild(makeRow(it, false)));
 
-  // disabled rows if expanded
   if(moreOpen[group]){
     const order = OPTIONAL_ORDER[group]||[];
     disabled.sort((a,b)=> (order.indexOf(a.id)+1 || 999) - (order.indexOf(b.id)+1 || 999));
     disabled.forEach(it => tbody.appendChild(makeRow(it, true)));
   }
 
-  // see more line
   const count = disabled.length;
   const line = moreLines[group];
   if(count>0){
@@ -341,7 +323,6 @@ function renderGroup(group){
     line.style.display="none";
   }
 
-  // Subtotal & group visibility
   subEls[group].textContent = fmtUSD(groupSubtotal(group));
   const groupEl = document.getElementById("grp"+group.charAt(0).toUpperCase()+group.slice(1));
   groupEl.style.display = (enabled.length>0 || (moreOpen[group] && disabled.length>0)) ? "" : "none";
@@ -360,7 +341,7 @@ function makeRow(it, isDisabled){
 
   const tdAct=document.createElement("td"); tdAct.className="col-act"; const wrap=document.createElement("div");
 
-  if(!isDisabled){ // enabled row
+  if(!isDisabled){
     const edit=document.createElement("button"); edit.className="btn inline"; edit.textContent="Edit";
     edit.addEventListener("click",()=>{
       tdAmt.innerHTML="";
@@ -375,9 +356,8 @@ function makeRow(it, isDisabled){
     const sep=document.createElement("span"); sep.textContent=" | "; sep.className="muted";
     const remove=document.createElement("button"); remove.className="btn inline"; remove.textContent="Remove";
     remove.addEventListener("click",()=>{ st.enabled=false; renderAll(); });
-
     wrap.appendChild(edit); wrap.appendChild(sep); wrap.appendChild(remove);
-  } else { // disabled row
+  } else {
     const add=document.createElement("button"); add.className="btn inline"; add.textContent="Add";
     add.addEventListener("click",()=>{ st.enabled=true; renderAll(); });
     wrap.appendChild(add);
@@ -419,13 +399,8 @@ function renderSummary(){
 }
 
 function grandTotal(){ return GROUPS.reduce((acc,g)=>acc+groupSubtotal(g),0); }
+function renderAll(){ GROUPS.forEach(renderGroup); renderSummary(); }
 
-function renderAll(){
-  GROUPS.forEach(renderGroup);
-  renderSummary();
-}
-
-// Toggles & controls
 function setPressed(el,on){ el.setAttribute("aria-pressed", on?"true":"false"); }
 const btnBurial=document.getElementById("opt-burial"), btnCrem=document.getElementById("opt-cremation"), svcFull=document.getElementById("svc-full"), svcMem=document.getElementById("svc-mem"), svcNone=document.getElementById("svc-none"), openYes=document.getElementById("open-yes"), openNo=document.getElementById("open-no"), rowOpen=document.getElementById("row-open-casket"), cemOnBtn=document.getElementById("cem-on"), cemOffBtn=document.getElementById("cem-off");
 function updateRules(){
@@ -443,11 +418,9 @@ openNo.addEventListener("click",()=>{openCasket=false;setPressed(openYes,false);
 cemOnBtn.addEventListener("click",()=>{cemeteryOn=true;setPressed(cemOnBtn,true);setPressed(cemOffBtn,false);updateRules();});
 cemOffBtn.addEventListener("click",()=>{cemeteryOn=false;setPressed(cemOnBtn,false);setPressed(cemOffBtn,true);updateRules();});
 
-// Itemized toggle
 const itemsToggle=document.getElementById("itemsToggle"), itemsSection=document.getElementById("itemsSection");
 itemsToggle.addEventListener("click",(e)=>{e.preventDefault();const hidden=itemsSection.style.display==="none";itemsSection.style.display=hidden?"":"none";itemsToggle.textContent=hidden?"Hide itemized costs":"Show itemized costs";});
 
-// Export & Reset
 document.getElementById("btnPrint")?.addEventListener("click",()=>window.print());
 document.getElementById("btnCSV")?.addEventListener("click",()=>{
   const lines=[["Group","Item","Amount","Qty","Included","Adjusted line total (USD)"]];
@@ -460,8 +433,7 @@ document.getElementById("btnCSV")?.addEventListener("click",()=>{
     lines.push([it.group,it.label,(Number(st.amount)||0).toFixed(0),qty,st.enabled?"Yes":"No",line.toFixed(0)]);
   });
   lines.push(["","","","","Grand total",grandTotal().toFixed(0)]);
-  const csv=lines.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("
-");
+  const csv=lines.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
   const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"}); const url=URL.createObjectURL(blob);
   const a=document.createElement("a"); a.href=url; a.download="quietpath-funeral-estimate.csv"; a.click(); URL.revokeObjectURL(url);
 });
@@ -474,15 +446,9 @@ document.getElementById("btnReset").addEventListener("click",()=>{
   window.scrollTo({top:0,behavior:"smooth"});
 });
 
-// Mobile dock actions
-document.getElementById('dockTop').addEventListener('click',()=>{
-  window.scrollTo({top:0,behavior:'smooth'});
-});
-document.getElementById('dockOptions').addEventListener('click',()=>{
-  document.getElementById('optionsSection').scrollIntoView({behavior:'smooth', block:'start'});
-});
+document.getElementById('dockTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+document.getElementById('dockOptions').addEventListener('click',()=>document.getElementById('optionsSection').scrollIntoView({behavior:'smooth', block:'start'}));
 
-// Boot
 function boot(){ buildStateSelect(); initDefaults(); renderAll(); }
 boot();
 </script>
