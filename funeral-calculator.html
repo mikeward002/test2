@@ -3,20 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>QuietPath • Funeral Cost Calculator (v14)</title>
+  <title>QuietPath • Funeral Cost Calculator (v17)</title>
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&family=Raleway:wght@700;800&display=swap" rel="stylesheet">
   <style>
     :root{
       --bg:#fcfbf9; --fg:#111; --muted:#6b7280;
       --blue:#5a7da3; --plum:#6e608c; --sand:#e8dcc8; --white:#fff;
       --border:#e5e7eb; --focus:#ffbf47;
-      --disabled:#9aa0a6;
     }
     html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);
       font-family:Lato,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
       line-height:1.6;font-size:16px;}
+    a{color:var(--blue);}
 
-    /* Header & Nav */
     .site-header{position:sticky;top:0;z-index:5;background:var(--white);border-bottom:1px solid var(--border);}
     .navwrap{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:10px 18px;}
     .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;}
@@ -32,8 +31,6 @@
        font-size:clamp(1.6rem,3vw,2.2rem);margin:8px 0 8px;}
     .lede{color:var(--muted);max-width:72ch;}
 
-    .intro-card{background:var(--sand);border:1px solid var(--border);border-radius:16px;padding:16px;display:grid;gap:8px;margin-top:8px;}
-    .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;}
     .btn{appearance:none;border:1px solid var(--blue);background:var(--blue);color:#fff;
       border-radius:999px;padding:10px 14px;font-size:1rem;cursor:pointer;}
     .btn.secondary{background:transparent;color:var(--blue);}
@@ -42,12 +39,17 @@
     .btn.inline{padding:0;border:none;background:none;color:var(--blue);text-decoration:underline;cursor:pointer;}
     .btn:focus{outline:3px solid var(--focus);outline-offset:2px;}
 
-    /* Layout */
-    .layout{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px;}
-    @media(min-width: 1000px){ .layout{grid-template-columns: 2fr 1fr;} .rail{position:sticky;top:88px;height:fit-content;} }
-
     .card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 1px 2px rgba(0,0,0,.04);}
     .section-title{font-family:Raleway,Lato,sans-serif;font-weight:700;color:var(--plum);margin:0 0 8px;font-size:1.15rem;}
+
+    .layout{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px;}
+    @media(min-width: 1100px){
+      .layout{grid-template-columns: 340px 1fr;}
+      .rail{position:sticky;top:88px;height:fit-content;}
+    }
+    @media(min-width: 1400px){
+      .layout{grid-template-columns: 360px 1fr;}
+    }
 
     .controls .row{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--border);flex-wrap:wrap;}
     .controls .row:last-child{border-bottom:none;}
@@ -57,16 +59,6 @@
     .pill{border:1px solid var(--border);background:#fff;border-radius:999px;padding:8px 12px;cursor:pointer;}
     .pill[aria-pressed="true"]{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue);color:var(--blue);font-weight:700;}
 
-    /* Summary */
-    .summary{display:grid;gap:10px;}
-    .bucket{display:flex;justify-content:space-between;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#fafafa;}
-    .bucket .name{font-weight:600;}
-    .bucket .amt{font-weight:700;}
-    .grand{display:flex;justify-content:space-between;padding:12px;border-top:2px solid var(--border);font-weight:800;font-size:1.2rem;color:var(--blue);}
-    .small{color:var(--muted);font-size:.95rem;}
-    .fine-print{color:#6b7280;font-size:.9rem;margin-top:6px;}
-
-    /* Items */
     .group{margin-top:12px;border-top:1px solid var(--border);padding-top:10px;}
     .group h3{display:flex;justify-content:space-between;align-items:baseline;font-family:Raleway,Lato,sans-serif;
       color:var(--blue);font-size:1.05rem;margin:0 0 8px;}
@@ -75,24 +67,30 @@
     thead th{padding:10px;border-bottom:1px solid var(--border);text-align:left;background:#f7f7f8;}
     tbody td{padding:10px;border-bottom:1px solid var(--border);vertical-align:middle;}
     .col-item{width:56%;} .col-amt{width:22%;text-align:right;} .col-act{width:22%;text-align:right;}
-
     .amount{font-variant-numeric:tabular-nums;font-weight:700;}
-    /* Strong selector to ensure strike/gray always applies */
     table tbody tr.row-disabled td.col-amt .amount{ color:#9aa0a6 !important; text-decoration: line-through !important; }
     table tbody tr.row-disabled td.col-item{ color:#9aa0a6; }
-
     .amount.editing input{width:140px;padding:8px 10px;border:1px solid var(--border);border-radius:10px;font-size:1rem;text-align:right;}
     .muted{color:#9aa0a6;}
-
     .footer-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:16px;}
 
-    /* Footer */
-    .site-footer{margin-top:40px;border-top:1px solid var(--border);background:#fff;}
-    .footwrap{max-width:1200px;margin:0 auto;padding:16px 18px;display:grid;gap:8px;}
-    .footnav{display:flex;gap:16px;flex-wrap:wrap;}
-    .footnav a{color:var(--fg);text-decoration:none;}
-    .footnav a:hover{text-decoration:underline;color:var(--blue);}
-    .copyright{color:var(--muted);font-size:.9rem;}
+    .summary{display:grid;gap:10px;}
+    .bucket{display:flex;justify-content:space-between;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#fafafa;}
+    .bucket .name{font-weight:600;}
+    .bucket .amt{font-weight:700;}
+    .grand{display:flex;justify-content:space-between;padding:12px;border-top:2px solid var(--border);font-weight:800;font-size:1.2rem;color:var(--blue);}
+    .small{color:var(--muted);font-size:.95rem;}
+    .fine-print{color:#6b7280;font-size:.9rem;margin-top:6px;}
+    .breakdown-toggle{margin-top:6px;}
+
+    .sticky-total{
+      position:fixed; left:0; right:0; top:0; z-index:6;
+      background:#ffffffcc; backdrop-filter:saturate(180%) blur(10px);
+      border-bottom:1px solid var(--border);
+      display:none;
+    }
+    .sticky-wrap{max-width:1200px;margin:0 auto;padding:10px 18px;display:flex;justify-content:space-between;align-items:center;}
+    .sticky-total strong{color:var(--blue);}
   </style>
 </head>
 <body>
@@ -110,21 +108,34 @@
     </div>
   </header>
 
+  <div class="sticky-total" id="stickyTotal">
+    <div class="sticky-wrap">
+      <div>Total estimate</div>
+      <div><strong id="stickyTotalAmt">$0</strong></div>
+    </div>
+  </div>
+
   <div class="container">
     <h1>Funeral Cost Calculator</h1>
     <p class="lede">A starting point to see typical costs, without pressure to decide everything right now.</p>
 
-    <div class="intro-card">
-      <div class="cta-row">
-        <button id="itemsToggle" class="btn">Show itemized costs</button>
-        <button id="optionsToggle" class="btn secondary">Hide options</button>
-      </div>
-    </div>
-
     <div class="layout">
-      <!-- Left column -->
+      <aside class="rail">
+        <section class="card" aria-labelledby="estTitle" id="estimateCard">
+          <h2 id="estTitle" class="section-title">Your Estimate</h2>
+          <div class="grand" style="margin-bottom:8px;"><span>Total</span><span id="grandTotal">$0</span></div>
+
+          <!-- OPEN by default on both desktop & mobile -->
+          <button class="btn secondary small breakdown-toggle" id="breakdownToggle" aria-expanded="true">Hide breakdown</button>
+          <div id="summaryWrap" class="summary" style="display:block; margin-top:10px;">
+            <div id="summary"></div>
+            <div class="small" style="margin-top:8px;">Most Americans choose cremation (~62%), so we start with a cremation memorial by default.</div>
+            <div class="fine-print"><strong>About these numbers:</strong> Based on national averages from public sources. Typical costs only — please consult your local funeral home or crematory for actual pricing.</div>
+          </div>
+        </section>
+      </aside>
+
       <div class="main">
-        <!-- Options (open by default) -->
         <section class="card" id="optionsSection">
           <h2 class="section-title">Options</h2>
           <div class="controls">
@@ -165,9 +176,12 @@
               <button id="btnReset" class="btn ghost small">Reset defaults</button>
             </div>
           </div>
+
+          <div style="margin-top:8px;">
+            <button id="itemsToggle" class="btn secondary small">Show itemized costs</button>
+          </div>
         </section>
 
-        <!-- Itemized (hidden by default) -->
         <section class="card" id="itemsSection" style="display:none; margin-top:16px;">
           <h2 class="section-title">Itemized costs</h2>
 
@@ -217,35 +231,23 @@
           </div>
         </section>
       </div>
-
-      <!-- Right rail -->
-      <aside class="rail">
-        <section class="card" aria-labelledby="estTitle">
-          <h2 id="estTitle" class="section-title">Your Estimate</h2>
-          <div id="summary" class="summary"></div>
-          <div class="grand"><span>Total estimate</span><span id="grandTotal">$0</span></div>
-          <p class="small">Most Americans choose cremation (~62%), so we start with a cremation memorial by default.</p>
-          <p class="fine-print"><strong>About these numbers:</strong> Based on national averages from public sources. Typical costs only — please consult your local funeral home or crematory for actual pricing.</p>
-        </section>
-      </aside>
     </div>
   </div>
 
   <footer class="site-footer">
-    <div class="footwrap">
-      <nav class="footnav" aria-label="Footer">
+    <div class="navwrap" style="display:block;">
+      <nav class="nav" aria-label="Footer" style="margin-bottom:8px;">
         <a href="/checklist.html">96‑Hour Checklist</a>
         <a href="/obituary-builder.html">AI Obituary Builder</a>
         <a href="/funeral-cost-calculator.html">Funeral Cost Calculator</a>
       </nav>
-      <div class="copyright">© <span id="year"></span> QuietPath. All rights reserved.</div>
+      <div class="small">&copy; <span id="year"></span> QuietPath. All rights reserved.</div>
     </div>
   </footer>
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // ----- Data -----
     const STATE_MULT = {
       "California":1.2,"New York":1.2,"Massachusetts":1.2,"Connecticut":1.2,"New Jersey":1.2,
       "District of Columbia":1.2,"Washington":1.2,"Oregon":1.2,"Hawaii":1.2,"Alaska":1.2,"Maryland":1.2,
@@ -253,10 +255,8 @@
       "Louisiana":0.8,"Tennessee":0.8,"Missouri":0.8,"New Mexico":0.8,"South Carolina":0.8,"Idaho":0.8
     };
     const ALL_STATES = ["National average","Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","District of Columbia","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
-
     const GROUPS = ["funeral","transport","ceremony","burial","cremation"];
 
-    // Items (optional add-ons reordered to most common first in ceremony)
     const ITEMS = [
       {id:"basic_services",label:"Basic services of funeral director and staff",base:2300,group:"funeral",applies:"both"},
       {id:"transfer",label:"Transfer of remains",base:350,group:"transport",applies:"both"},
@@ -272,25 +272,20 @@
       {id:"headstone",label:"Headstone / marker",base:2000,group:"burial",applies:"both",isCemetery:true},
       {id:"cremation_fee",label:"Cremation fee",base:350,group:"cremation",applies:"cremation"},
       {id:"urn",label:"Urn",base:250,group:"cremation",applies:"cremation"},
-
-      // Optional add-ons (visible but disabled)
       {id:"flowers",label:"Flowers",base:150,group:"ceremony",applies:"both",optional:true,enabled:false},
       {id:"programs",label:"Printed programs / memorial cards",base:180,group:"ceremony",applies:"both",optional:true,enabled:false},
       {id:"obituary",label:"Obituary / announcement fees",base:100,group:"ceremony",applies:"both",optional:true,enabled:false},
       {id:"honorarium",label:"Clergy / celebrant honorarium",base:200,group:"ceremony",applies:"both",optional:true,enabled:false},
       {id:"catering",label:"Family gathering / catering",base:300,group:"ceremony",applies:"both",optional:true,enabled:false},
       {id:"liner",label:"Grave liner (if not using vault)",base:900,group:"burial",applies:"burial",optional:true,enabled:false},
-
-      // Open-casket related
       {id:"presentation",label:"Presentation prep (dressing/cosmetics)",base:200,group:"funeral",applies:"burial",optional:true,enabled:false},
       {id:"refrigeration",label:"Refrigeration (per day)",base:100,group:"funeral",applies:"both",optional:true,enabled:false,qtyFactor:true,qty:1}
     ];
 
-    // ----- State -----
-    let scenario = "cremation";          // default majority
+    let scenario = "cremation";
     let serviceLevel = "mem";
     let cemeteryOn = false;
-    let openCasket = false;               // hidden for cremation
+    let openCasket = false;
     let multiplier = 1.0;
 
     const itemState = new Map();
@@ -298,6 +293,7 @@
     function defaultEnabled(it){
       const applies = it.applies==="both" || it.applies===scenario;
       if(!applies) return false;
+      if(it.isCemetery && !cemeteryOn) return false;
       if(it.id==="viewing"){ return serviceLevel==="full"; }
       if(it.id==="ceremony"){ return serviceLevel==="full" || serviceLevel==="mem"; }
       if(it.id==="service_car"){ return serviceLevel==="full"; }
@@ -314,9 +310,6 @@
         const embalmingOn = scenario==="burial" && serviceLevel==="full" && openCasket;
         return !embalmingOn && (serviceLevel!=="none");
       }
-      // Cemetery items: default enabled only if cemeteryOn true AND scenario allows
-      if(it.isCemetery){ return cemeteryOn && (scenario==="burial" || scenario==="cremation"); }
-      // Optional defaults
       if(it.optional && it.enabled===false) return false;
       return true;
     }
@@ -328,7 +321,6 @@
 
     const fmtUSD = n => Number(n).toLocaleString(undefined,{style:"currency",currency:"USD",maximumFractionDigits:0});
 
-    // ----- Build state select -----
     const stateSelect = document.getElementById("stateSelect");
     function buildStateSelect(){
       stateSelect.innerHTML = "";
@@ -347,7 +339,6 @@
     }
     stateSelect.addEventListener("change", applyState);
 
-    // ----- Render items -----
     const bodies = {
       funeral: document.getElementById("bodyFuneral"),
       transport: document.getElementById("bodyTransport"),
@@ -366,12 +357,11 @@
     function renderItems(){
       Object.values(bodies).forEach(el => el.innerHTML="");
       ITEMS.forEach(it => {
-        // Always render items that apply to current scenario (and render cemetery even if cemeteryOn is false)
         const applies = it.applies==="both" || it.applies===scenario;
         if(!applies) return;
+        if(it.isCemetery && !cemeteryOn) return;
         const st = itemState.get(it.id);
 
-        // Build the row we actually append
         const row = document.createElement("tr");
         if(!st.enabled) row.classList.add("row-disabled");
 
@@ -432,15 +422,7 @@
           const add = document.createElement("button");
           add.className="btn inline";
           add.textContent="Add";
-          add.addEventListener("click", () => {
-            // If adding a cemetery item while cemetery toggle is Off, turn it On for them.
-            if(it.isCemetery && !cemeteryOn){
-              cemeteryOn = true;
-              setPressed(document.getElementById("cem-on"), true);
-              setPressed(document.getElementById("cem-off"), false);
-            }
-            st.enabled=true; renderAll();
-          });
+          add.addEventListener("click", () => { st.enabled=true; renderAll(); });
           actWrap.appendChild(add);
         }
 
@@ -451,7 +433,7 @@
         tbody.appendChild(row);
       });
 
-      GROUPS.forEach(g => {
+      ["funeral","transport","ceremony","burial","cremation"].forEach(g => {
         const groupEl = document.getElementById("grp"+g.charAt(0).toUpperCase()+g.slice(1));
         const subEl = subEls[g];
         const rows = bodies[g].children.length;
@@ -467,6 +449,7 @@
         const st = itemState.get(it.id);
         const applies = it.applies==="both" || it.applies===scenario;
         if(!applies) return;
+        if(it.isCemetery && !cemeteryOn) return;
         if(!st.enabled) return;
         const qty = it.qtyFactor ? (st.qty||1) : 1;
         sum += (Number(st.amount)||0) * qty * multiplier;
@@ -477,8 +460,7 @@
     function renderSummary(){
       const summary = document.getElementById("summary");
       summary.innerHTML = "";
-      const order = ["funeral","transport","ceremony","burial","cremation"];
-      order.forEach(g => {
+      ["funeral","transport","ceremony","burial","cremation"].forEach(g => {
         const val = groupSubtotal(g);
         if(val<=0) return;
         const div = document.createElement("div");
@@ -492,14 +474,15 @@
         div.appendChild(name); div.appendChild(amt);
         summary.appendChild(div);
       });
-      document.getElementById("grandTotal").textContent = fmtUSD(grandTotal());
+      const total = grandTotal();
+      document.getElementById("grandTotal").textContent = fmtUSD(total);
+      document.getElementById("stickyTotalAmt").textContent = fmtUSD(total);
     }
 
-    function grandTotal(){ return GROUPS.reduce((acc,g)=> acc + groupSubtotal(g), 0); }
+    function grandTotal(){ return ["funeral","transport","ceremony","burial","cremation"].reduce((acc,g)=> acc + groupSubtotal(g), 0); }
 
     function renderAll(){ renderItems(); renderSummary(); }
 
-    // ----- Toggles & controls -----
     function setPressed(el, on){ el.setAttribute("aria-pressed", on ? "true":"false"); }
 
     const btnBurial = document.getElementById("opt-burial");
@@ -533,33 +516,24 @@
     cemOnBtn.addEventListener("click", () => { cemeteryOn=true; setPressed(cemOnBtn,true); setPressed(cemOffBtn,false); updateRules(); });
     cemOffBtn.addEventListener("click", () => { cemeteryOn=false; setPressed(cemOnBtn,false); setPressed(cemOffBtn,true); updateRules(); });
 
-    // Collapsible sections without auto-scroll
     const itemsToggle = document.getElementById("itemsToggle");
-    const optionsToggle = document.getElementById("optionsToggle");
     const itemsSection = document.getElementById("itemsSection");
-    const optionsSection = document.getElementById("optionsSection");
     itemsToggle.addEventListener("click", (e)=>{
       e.preventDefault();
       const hidden = itemsSection.style.display === "none";
       itemsSection.style.display = hidden ? "" : "none";
       itemsToggle.textContent = hidden ? "Hide itemized costs" : "Show itemized costs";
     });
-    optionsToggle.addEventListener("click", (e)=>{
-      e.preventDefault();
-      const hidden = optionsSection.style.display === "none";
-      optionsSection.style.display = hidden ? "" : "none";
-      optionsToggle.textContent = hidden ? "Hide options" : "Show options";
-    });
 
-    // Export & Reset
-    document.getElementById("btnPrint").addEventListener("click", () => window.print());
-    document.getElementById("btnCSV").addEventListener("click", () => {
+    document.getElementById("btnPrint")?.addEventListener("click", () => window.print());
+    document.getElementById("btnCSV")?.addEventListener("click", () => {
       const lines=[["Group","Item","Amount","Qty","Included","Adjusted line total (USD)"]];
       ITEMS.forEach(it => {
         const st = itemState.get(it.id);
         if(!st) return;
         const applies = it.applies==="both" || it.applies===scenario;
         if(!applies) return;
+        if(it.isCemetery && !cemeteryOn) return;
         const qty = it.qtyFactor ? (st.qty||1) : 1;
         const line = (Number(st.amount)||0) * qty * multiplier;
         lines.push([it.group,it.label,(Number(st.amount)||0).toFixed(0),qty,st.enabled?"Yes":"No",line.toFixed(0)]);
@@ -572,28 +546,40 @@
     });
 
     document.getElementById("btnReset").addEventListener("click", () => {
-      // Reset toggles to defaults
-      scenario = "cremation";
-      serviceLevel = "mem";
-      cemeteryOn = false;
-      openCasket = false;
-      multiplier = 1.0;
-      // Update toggle UI
+      scenario = "cremation"; serviceLevel = "mem"; cemeteryOn = false; openCasket = false; multiplier = 1.0;
       setPressed(btnBurial,false); setPressed(btnCrem,true);
       setPressed(svcFull,false); setPressed(svcMem,true); setPressed(svcNone,false);
       setPressed(openYes,false); setPressed(openNo,true);
       setPressed(cemOnBtn,false); setPressed(cemOffBtn,true);
       stateSelect.value = "National average";
-      // Reset items & re-render
-      initDefaults();
-      renderAll();
+      initDefaults(); renderAll();
+      if(itemsSection.style.display!=="none"){ itemsToggle.click(); }
+      window.scrollTo({top:0,behavior:"smooth"});
     });
 
-    // Boot
+    const sticky = document.getElementById("stickyTotal");
+    const estCard = document.getElementById("estimateCard");
+    function onScroll(){
+      const rect = estCard.getBoundingClientRect();
+      const show = rect.bottom < 0;
+      sticky.style.display = show ? "block" : "none";
+    }
+    window.addEventListener("scroll", onScroll);
+
+    const breakdownToggle = document.getElementById("breakdownToggle");
+    const summaryWrap = document.getElementById("summaryWrap");
+    breakdownToggle.addEventListener("click", ()=>{
+      const exp = breakdownToggle.getAttribute("aria-expanded")==="true";
+      breakdownToggle.setAttribute("aria-expanded", String(!exp));
+      summaryWrap.style.display = exp ? "none" : "block";
+      breakdownToggle.textContent = exp ? "View breakdown" : "Hide breakdown";
+    });
+
     function boot(){
       buildStateSelect();
       initDefaults();
       renderAll();
+      onScroll();
     }
     boot();
   </script>
