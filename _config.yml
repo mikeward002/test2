@@ -1,0 +1,4 @@
+title: QuietPath
+url: "https://mikeward002.github.io"
+baseurl: "/test2"   # ← change if this repo name is different
+markdown: kramdown
