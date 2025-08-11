@@ -1,95 +1,88 @@
----
-layout: default
-title: Find Funeral Homes Near You | QuietPath
-permalink: /funeral-home-finder.html
----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Find Funeral Homes Near You | QuietPath</title>
+  <meta name="description" content="Find funeral homes, cemeteries, cremation services, and headstone providers near you. Filter by distance, rating, and hours.">
+  <link rel="stylesheet" href="quietpath-styles.css" />
+</head>
+<body>
+  <!-- Shared header will be loaded here -->
+  <div id="site-header"></div>
 
-<header class="band">
-  <div class="container">
-    <h1>Find Funeral Homes Near You</h1>
-    <p class="subhead">Search nearby funeral homes and related services. Filter by distance, rating, and hours. Switch between map and list views.</p>
-  </div>
-</header>
-
-<section class="controls">
-  <div class="container controls-grid" role="region" aria-label="Search controls">
-    <label class="visually-hidden" for="locationInput">Search by city, address, or ZIP</label>
-    <input id="locationInput" class="input" type="text" placeholder="City, address, or ZIP" aria-label="Location search"/>
-
-    <label class="visually-hidden" for="distanceSelect">Max distance</label>
-    <select id="distanceSelect" class="select" aria-label="Max distance">
-      <option value="5">5 miles</option>
-      <option value="10" selected>10 miles</option>
-      <option value="25">25 miles</option>
-      <option value="50">50 miles</option>
-    </select>
-
-    <label class="visually-hidden" for="minRatingSelect">Minimum rating</label>
-    <select id="minRatingSelect" class="select" aria-label="Minimum rating">
-      <option value="0">Any rating</option>
-      <option value="2">2.0+</option>
-      <option value="3">3.0+</option>
-      <option value="3.5">3.5+</option>
-      <option value="4" selected>4.0+</option>
-      <option value="4.5">4.5+</option>
-    </select>
-
-    <label class="visually-hidden" for="minReviewsSelect">Minimum reviews</label>
-    <select id="minReviewsSelect" class="select" aria-label="Minimum number of reviews">
-      <option value="0" selected>Any reviews</option>
-      <option value="5">5+</option>
-      <option value="10">10+</option>
-      <option value="25">25+</option>
-    </select>
-
-    <div class="toggle-wrap">
-      <input id="openNowCheckbox" type="checkbox" />
-      <label for="openNowCheckbox">Open now</label>
+  <header class="band">
+    <div class="container">
+      <h1>Find Funeral Homes Near You</h1>
+      <p class="subhead">Search nearby funeral homes and related services. Filter by distance, rating, and hours. Switch between map and list views.</p>
     </div>
+  </header>
 
-    <button id="applyBtn" class="btn btn-primary">Apply</button>
-
-    <div class="segmented" role="tablist" aria-label="View mode">
-      <button id="mapTab" class="segmented-btn active" role="tab" aria-selected="true" aria-pressed="true">Map</button>
-      <button id="listTab" class="segmented-btn" role="tab" aria-selected="false" aria-pressed="false">List</button>
+  <section class="controls">
+    <div class="container controls-grid" role="region" aria-label="Search controls">
+      <input id="locationInput" class="input" type="text" placeholder="City, address, or ZIP" aria-label="Location search"/>
+      <select id="distanceSelect" class="select" aria-label="Max distance">
+        <option value="5">5 miles</option>
+        <option value="10" selected>10 miles</option>
+        <option value="25">25 miles</option>
+        <option value="50">50 miles</option>
+      </select>
+      <select id="minRatingSelect" class="select" aria-label="Minimum rating">
+        <option value="0">Any rating</option>
+        <option value="2">2.0+</option>
+        <option value="3">3.0+</option>
+        <option value="3.5">3.5+</option>
+        <option value="4" selected>4.0+</option>
+        <option value="4.5">4.5+</option>
+      </select>
+      <select id="minReviewsSelect" class="select" aria-label="Minimum number of reviews">
+        <option value="0" selected>Any reviews</option>
+        <option value="5">5+</option>
+        <option value="10">10+</option>
+        <option value="25">25+</option>
+      </select>
+      <div class="toggle-wrap">
+        <input id="openNowCheckbox" type="checkbox" />
+        <label for="openNowCheckbox">Open now</label>
+      </div>
+      <button id="applyBtn" class="btn btn-primary">Apply</button>
+      <div class="segmented" role="tablist" aria-label="View mode">
+        <button id="mapTab" class="segmented-btn active" role="tab" aria-selected="true" aria-pressed="true">Map</button>
+        <button id="listTab" class="segmented-btn" role="tab" aria-selected="false" aria-pressed="false">List</button>
+      </div>
     </div>
+  </section>
+
+  <div class="search-area-wrap">
+    <button id="searchAreaBtn" class="btn btn-secondary" hidden>Search this area</button>
   </div>
-</section>
 
-<div class="search-area-wrap">
-  <button id="searchAreaBtn" class="btn btn-secondary" hidden>Search this area</button>
-</div>
+  <main class="container main">
+    <div id="map" aria-label="Map of results"></div>
+    <div id="list" aria-label="List of results" hidden></div>
+  </main>
 
-<section class="container main">
-  <div id="map" aria-label="Map of results"></div>
-  <div id="list" aria-label="List of results" hidden></div>
-</section>
+  <section class="container seo-copy">
+    <h2>Find funeral homes and related services</h2>
+    <p>
+      QuietPath helps you quickly find funeral homes, cemeteries, cremation services, and headstone providers near you.
+      Use filters to narrow results by distance and community ratings, or check who is open right now.
+      Switch between a map and a clean list view to plan the next steps with clarity.
+    </p>
+  </section>
 
-<section class="container seo-copy">
-  <h2>Find funeral homes and related services</h2>
-  <p>
-    QuietPath helps you quickly find funeral homes, cemeteries, cremation services, and headstone providers near you.
-    Use filters to narrow results by distance and community ratings, or check who is open right now. Switch between a map
-    and a clean list view to plan the next steps with clarity.
-  </p>
-  <h3>Frequently asked questions</h3>
-  <details>
-    <summary>Where does this data come from?</summary>
-    <p>We use Google Maps and Places to discover businesses near your location. Some fields may be missing if providers do not share them publicly.</p>
-  </details>
-  <details>
-    <summary>Can I change the search area?</summary>
-    <p>Yes. Pan or zoom the map and click “Search this area.” You can also type a city, address, or ZIP and press Enter.</p>
-  </details>
-  <details>
-    <summary>Why do ratings or reviews look different from other sites?</summary>
-    <p>Ratings and review counts come from Google users and may differ from other directories. We also let you lower filters to see more options.</p>
-  </details>
-</section>
+  <!-- Shared footer will be loaded here -->
+  <div id="site-footer"></div>
 
-<script src="{{ '/app.js' | relative_url }}"></script>
+  <script>
+    // Load shared header and footer
+    fetch('header.html').then(r => r.text()).then(html => document.getElementById('site-header').innerHTML = html);
+    fetch('footer.html').then(r => r.text()).then(html => document.getElementById('site-footer').innerHTML = html);
+  </script>
 
-<!-- Replace YOUR_REAL_API_KEY_HERE with your key -->
-<script async defer
-  src="https://maps.googleapis.com/maps/api/js?key=YOUR_REAL_API_KEY_HERE&libraries=places&callback=initApp">
-</script>
+  <script src="app.js"></script>
+
+  <!-- Google Maps + Places -->
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqXEGAW2Fao6QpaNor0cGjX7xjXlZRi_w&libraries=places&callback=initApp"></script>
+</body>
+</html>
