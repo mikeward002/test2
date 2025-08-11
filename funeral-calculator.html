@@ -1,20 +1,21 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>QuietPath • Funeral Cost Calculator (v21e-linked)</title>
+<title>QuietPath • Funeral Cost Calculator (v21h)</title>
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&family=Raleway:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="quietpath-styles.css">
+<link rel="stylesheet" href="quietpath-styles-v21h.css">
 <style>
-/* minimal page-specific styles (most is in quietpath-styles.css) */
+/* Minimal page-specific tweaks to keep reuse-friendly CSS separate */
 h1{font-family:Raleway,Lato,sans-serif;font-weight:800;color:var(--blue);font-size:clamp(1.6rem,3vw,2.2rem);margin:8px 0 8px;}
 .lede{color:var(--muted);max-width:72ch;}
 .controls .row{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--border);flex-wrap:wrap;}
 .controls .row:last-child{border-bottom:none;}
 label.muted{color:var(--muted);min-width:150px;}
-select{font-size:16px;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--fg);}
-#stateSelect{font-size:.9rem;color:var(--muted);}
+select{font-size:16px;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--fg);} /* avoid iOS zoom */
+#stateSelect{font-size:.9rem;color:var(--muted);} /* smaller/warmer */
 .togglebar{display:flex;gap:8px;flex-wrap:wrap;}
 .pill{border:1px solid var(--border);background:#fff;border-radius:999px;padding:8px 12px;cursor:pointer;}
 .pill[aria-pressed="true"]{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue);color:var(--blue);font-weight:700;}
@@ -33,6 +34,17 @@ tr.row-disabled td.col-item{color:#9aa0a6;}
 .grand{display:flex;justify-content:space-between;padding:12px;border-top:2px solid var(--border);font-weight:800;font-size:1.2rem;color:var(--blue);}
 .notes-desktop{display:none;} @media(min-width:1100px){.notes-desktop{display:block;margin-top:10px;}}
 .bottom-notes{display:none;} @media(max-width:999px){.bottom-notes{display:block;margin:72px 0 16px;}}
+/* Table structure */
+table{width:100%;border-collapse:collapse;table-layout:fixed;}
+colgroup col.col-item{width:56%;}
+colgroup col.col-amt{width:22%;}
+colgroup col.col-act{width:22%;}
+thead th{padding:10px;border-bottom:1px solid var(--border);text-align:left;background:#f7f7f8;}
+tbody td{padding:10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+td.col-item{word-break:break-word;padding-right:12px;}
+td.col-amt{text-align:right;white-space:nowrap;position:relative;}
+td.col-act{text-align:right;}
+thead th.col-amt, thead th.col-act{ text-align:right; }
 </style>
 </head>
 <body>
@@ -185,10 +197,11 @@ tr.row-disabled td.col-item{color:#9aa0a6;}
   </div>
 </div>
 
-<!-- Mobile Bottom Dock -->
+<!-- Mobile Bottom Dock: keep total; buttons commented -->
 <div class="mobile-dock" id="mobileDock" role="region" aria-label="Total estimate">
   <div class="dock-wrap">
-     <!--
+    <div class="dock-total">Total estimate: <strong id="dockTotalAmt">$0</strong></div>
+    <!--
     <div class="dock-actions">
       <button class="btn dock-outline small" id="dockOptions">Options</button>
       <button class="btn dock-filled small" id="dockTop">Top</button>
@@ -225,10 +238,8 @@ window.addEventListener('resize', ()=>{ clearTimeout(window._menuT); window._men
 syncMenu();
 
 // ----- Data -----
-// Multipliers for a few known high/low-cost states; all others default to 1.0
 const STATE_MULT={"California":1.2,"New York":1.2,"Massachusetts":1.2,"Connecticut":1.2,"New Jersey":1.2,"District of Columbia":1.2,"Washington":1.2,"Oregon":1.2,"Hawaii":1.2,"Alaska":1.2,"Maryland":1.2,"Alabama":0.8,"Arkansas":0.8,"Mississippi":0.8,"Oklahoma":0.8,"Kentucky":0.8,"West Virginia":0.8,"Louisiana":0.8,"Tennessee":0.8,"Missouri":0.8,"New Mexico":0.8,"South Carolina":0.8,"Idaho":0.8};
 
-// Build a complete list of states safely (no long inline array that might get truncated during edits)
 const ALL_STATES = ["National average"].concat("Alabama,Alaska,Arizona,Arkansas,California,Colorado,Connecticut,Delaware,District of Columbia,Florida,Georgia,Hawaii,Idaho,Illinois,Indiana,Iowa,Kansas,Kentucky,Louisiana,Maine,Maryland,Massachusetts,Michigan,Minnesota,Mississippi,Missouri,Montana,Nebraska,Nevada,New Hampshire,New Jersey,New Mexico,New York,North Carolina,North Dakota,Ohio,Oklahoma,Oregon,Pennsylvania,Rhode Island,South Carolina,South Dakota,Tennessee,Texas,Utah,Vermont,Virginia,Washington,West Virginia,Wisconsin,Wyoming".split(","));
 
 const GROUPS=["funeral","transport","ceremony","burial","cremation"];
@@ -447,8 +458,7 @@ document.getElementById("btnReset").addEventListener("click",()=>{
   window.scrollTo({top:0,behavior:"smooth"});
 });
 
-document.getElementById('dockTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
-document.getElementById('dockOptions').addEventListener('click',()=>document.getElementById('optionsSection').scrollIntoView({behavior:'smooth', block:'start'}));
+// (Buttons removed in HTML) — no dock button event listeners needed.
 
 function boot(){ buildStateSelect(); initDefaults(); renderAll(); }
 boot();
