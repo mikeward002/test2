@@ -1,3 +1,4 @@
+
 ---
 layout: default
 title: Funeral Home Finder
@@ -65,5 +66,8 @@ title: Funeral Home Finder
     </details>
 </div>
 
-<script src="app.js"></script>
+<!-- Load your app logic first; use Jekyll relative_url so it works on GitHub Pages and custom domains -->
+<script src="{{ '/js/app.js' | relative_url }}" defer></script>
+
+<!-- Load Maps with async+defer and a global callback name that app.js must attach to window (window.initApp = initApp) -->
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhD1oiVj4rM6ykQDEg7ZADs6RMkcycD3M&libraries=places&callback=initApp"></script>
