@@ -5,57 +5,79 @@ title: Funeral Home Finder
 ---
 
 <!--
-This file is Jekyll-processed (front matter above), so Liquid tags like relative_url will work.
-It loads js/app.js correctly and loads Google Maps asynchronously with a global callback.
+Finder page (Option A: loading=async). This HTML matches IDs expected by js/app.js.
+Update YOUR_API_KEY below.
 -->
 
-<div class="container">
-  <h1>Find Funeral Homes Near You</h1>
-  <p>Search nearby funeral homes and related services. Filter by distance, rating, and hours. Switch between map and list views.</p>
+<style>
+.finder-wrap{max-width:1100px;margin:0 auto;padding:0 12px}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0 16px}
+.toolbar .tabs{display:flex;gap:6px;margin-left:auto}
+.tabs button{appearance:none;border:1px solid #cfd4d9;background:#fff;border-radius:999px;padding:8px 12px;cursor:pointer}
+.tabs button.active{border-color:#5a7dab;box-shadow:inset 0 0 0 1px #5a7dab;color:#3b5e86;font-weight:700}
+#map{width:100%;height:520px;border:1px solid #e5e7ea;border-radius:12px}
+#list{display:block}
+#searchAreaBtn{margin:10px 0}
+.card{border:1px solid #e5e7ea;border-radius:12px;padding:12px;margin:10px 0;background:#fff}
+.muted{color:#6b7280}
+.btn{appearance:none;border:1px solid #cfd4d9;background:#fff;border-radius:10px;padding:8px 12px;cursor:pointer}
+.btn-primary{background:#5a7dab;color:#fff;border-color:#5a7dab}
+.btn-secondary{background:#eef2f6}
+.chips{display:flex;gap:8px;margin:6px 0}
+.chip{background:#eef2f6;border:1px solid #d7dde4;border-radius:999px;padding:2px 8px;font-size:.85rem}
+.result-header{display:flex;justify-content:space-between;gap:8px}
+.rating{font-weight:600}
+.empty{padding:12px}
+@media (max-width:720px){#map{height:420px}}
+</style>
 
-  <div class="controls" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:1rem;">
-    <input id="location-input" type="text" placeholder="City, address, or ZIP">
-    <select id="distance">
-      <option value="10">10 miles</option>
-      <option value="25">25 miles</option>
-      <option value="50">50 miles</option>
-    </select>
-    <select id="rating">
-      <option value="0">Any rating</option>
-      <option value="4">4.0+</option>
-      <option value="4.5">4.5+</option>
-    </select>
-    <select id="reviews">
-      <option value="0">Any reviews</option>
-      <option value="10">10+ reviews</option>
-      <option value="50">50+ reviews</option>
-    </select>
-    <label><input type="checkbox" id="open-now"> Open now</label>
-    <button id="apply-filters">Apply</button>
+<div class="finder-wrap">
+  <h1>Find Funeral Homes Near You</h1>
+  <p class="muted">Search nearby funeral homes and related services. Filter by distance, rating, and hours. Switch between map and list views.</p>
+
+  <div class="toolbar" role="region" aria-label="Search filters">
+    <input id="locationInput" type="text" placeholder="City, address, or ZIP" style="min-width:240px">
+    <label>Distance
+      <select id="distanceSelect">
+        <option value="10">10 miles</option>
+        <option value="25">25 miles</option>
+        <option value="50">50 miles</option>
+      </select>
+    </label>
+    <label>Min rating
+      <select id="minRatingSelect">
+        <option value="0">Any</option>
+        <option value="4">4.0+</option>
+        <option value="4.5">4.5+</option>
+      </select>
+    </label>
+    <label>Min reviews
+      <select id="minReviewsSelect">
+        <option value="0">Any</option>
+        <option value="10">10+</option>
+        <option value="50">50+</option>
+      </select>
+    </label>
+    <label><input type="checkbox" id="openNowCheckbox"> Open now</label>
+    <button id="applyBtn" class="btn">Apply</button>
+
+    <div class="tabs" role="tablist" aria-label="View">
+      <button id="mapTab" class="active" role="tab" aria-selected="true" aria-controls="map">Map</button>
+      <button id="listTab" role="tab" aria-selected="false" aria-controls="list">List</button>
+    </div>
   </div>
 
-  <div id="map" style="width:100%;height:500px;margin-bottom:1rem;"></div>
+  <button id="searchAreaBtn" class="btn" hidden>Search this area</button>
+
+  <div id="map" role="region" aria-label="Map results"></div>
+  <div id="list" hidden role="region" aria-label="List results"></div>
 
   <h2>Find funeral homes and related services</h2>
-  <p>QuietPath helps you quickly find funeral homes, cemeteries, cremation services, and headstone providers near you. Use filters to narrow results by distance and community ratings, or check who is open right now. Switch between a map and a clean list view to plan the next steps with clarity.</p>
-
-  <h3>Frequently asked questions</h3>
-  <details>
-    <summary>Where does this data come from?</summary>
-    <p>We use Google Maps data for location, ratings, and reviews.</p>
-  </details>
-  <details>
-    <summary>Can I change the search area?</summary>
-    <p>Yes, pan or zoom the map and click "Search this area."</p>
-  </details>
-  <details>
-    <summary>Why do ratings or reviews look different from other sites?</summary>
-    <p>They are sourced from Google’s reviews and may differ from other directories.</p>
-  </details>
+  <p class="muted">QuietPath helps you quickly find funeral homes, cemeteries, cremation services, and headstone providers near you. Use filters to narrow results by distance and community ratings, or check who is open right now.</p>
 </div>
 
-<!-- Load app logic with a path that works on both GitHub Pages and custom domains -->
-<script src="{{ '/js/app.js' | relative_url }}" defer></script>
+<!-- Load your app logic first (no defer) so the global callback exists when Maps fires) -->
+<script src="{{ '/js/app.js' | relative_url }}"></script>
 
-<!-- Load Maps asynchronously; js/app.js must set: window.initApp = initApp -->
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhD1oiVj4rM6ykQDEg7ZADs6RMkcycD3M&libraries=places&callback=initApp"></script>
+<!-- Option A: Google recommended pattern using loading=async (no async/defer attributes) -->
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initApp&loading=async"></script>
