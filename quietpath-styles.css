@@ -74,3 +74,55 @@ thead th.col-amt, thead th.col-act{ text-align:right; }
 .dock-total strong{font-weight:800;}
 .dock-actions{display:flex;gap:8px;}
 @media(max-width:999px){ .mobile-dock{display:block;} }
+
+
+
+/* --- Additions for Funeral Calculator UI (pills, toggles, summary, disabled rows) --- */
+
+/* Controls layout */
+.controls{display:flex;flex-direction:column;gap:12px;}
+.controls .row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.controls .row label{min-width:170px;}
+.controls select{padding:8px 10px;border:1px solid var(--border);border-radius:10px;background:#fff;color:#333;font-size:.95rem;}
+.controls .togglebar{display:flex;gap:8px;flex-wrap:wrap;}
+
+/* Option "pill" buttons */
+.pill{appearance:none;border:1px solid var(--border);background:#fff;color:var(--fg);border-radius:999px;padding:8px 12px;cursor:pointer;}
+.pill:hover{border-color:var(--blue);color:var(--blue);}
+.pill[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700;}
+.pill:focus{outline:3px solid var(--focus);outline-offset:2px;}
+
+/* Estimate summary + grand total */
+#estimateCard .grand{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-top:6px;border-top:1px solid var(--border);padding-top:10px;}
+#estimateCard .grand span:last-child{font-size:1.35rem;font-weight:800;}
+.summary{display:flex;flex-direction:column;gap:8px;}
+.summary .bucket{display:flex;justify-content:space-between;gap:12px;font-weight:600;}
+.summary .bucket .name{color:#333;}
+.summary .bucket .amt{font-variant-numeric:tabular-nums;}
+
+/* Group headings + subtotals */
+.group{margin-top:8px;}
+.group h3{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:6px 0 8px;}
+.group .subtotal{font-weight:800;color:#222;}
+
+/* "See more options" line */
+.moreline{margin-top:6px;text-align:left;}
+.moreline .btn.linkish{text-decoration:underline;}
+
+/* Disabled rows: grey + strikethrough (but keep Actions readable) */
+.row-disabled td.col-item,
+.row-disabled td.col-amt .amount{color:#9aa0a6;text-decoration:line-through;}
+.row-disabled td.col-act{opacity:.85;}
+
+/* Bottom notes spacing */
+.bottom-notes .card{margin-top:10px}
+
+/* Minor: tighten tables and prevent overlap on long labels */
+tbody td{line-height:1.4;}
+td.col-item{word-break:break-word;}
+
+/* Mobile tweaks */
+@media(max-width:600px){
+  .controls .row{flex-direction:column;align-items:flex-start;}
+  .controls .row label{min-width:0;}
+}
