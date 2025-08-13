@@ -1,9 +1,9 @@
+
 ---
 layout: default
 title: Funeral Cost Calculator
 ---
 
-<!-- Content-only page: relies on site layout for header/footer -->
 <link rel="stylesheet" href="{{ '/quietpath-styles.css' | relative_url }}">
 
 <div class="container">
@@ -11,7 +11,6 @@ title: Funeral Cost Calculator
   <p class="lede">A starting point to see typical costs, without pressure to decide everything right now.</p>
 
   <div class="layout">
-    <!-- Left rail (or right in your layout) -->
     <aside class="rail">
       <section class="card" aria-labelledby="estTitle" id="estimateCard">
         <h2 id="estTitle" class="section-title">Your Estimate</h2>
@@ -26,7 +25,6 @@ title: Funeral Cost Calculator
       </section>
     </aside>
 
-    <!-- Main column -->
     <div class="main">
       <section class="card" id="optionsSection">
         <h2 class="section-title">Options</h2>
@@ -148,12 +146,10 @@ title: Funeral Cost Calculator
   </div>
 </div>
 
-<!-- Mobile Bottom Dock: total only (no buttons) -->
 <div class="mobile-dock" id="mobileDock" role="region" aria-label="Total estimate">
   <div class="dock-wrap">
     <div class="dock-total">Total estimate: <strong id="dockTotalAmt">$0</strong></div>
   </div>
 </div>
 
-<!-- Calculator JS (separate file) -->
 <script src="{{ '/js/funeral-calculator.js' | relative_url }}"></script>
