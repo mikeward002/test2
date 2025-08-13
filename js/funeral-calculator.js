@@ -1,4 +1,3 @@
-
 /* QuietPath • Funeral Cost Calculator (separate JS)
    - Mobile bottom dock (total only)
    - "See more options" collapsed by default
