@@ -279,16 +279,4 @@
     boot();
   }
 
-  // helpers after boot
-  function buildStateSelect(){
-    if(!stateSelect) return;
-    stateSelect.innerHTML="";
-    ALL_STATES.forEach(s=>{
-      const o=document.createElement("option");o.value=s;o.textContent=s;stateSelect.appendChild(o);
-    });
-    stateSelect.value="National average"; multiplier=1.0;
-    stateSelect.addEventListener("change",()=>{
-      const s=stateSelect.value; multiplier=(s==="National average")?1.0:(STATE_MULT[s]||1.0); renderAll();
-    });
-  }
 })();
