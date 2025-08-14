@@ -44,7 +44,16 @@
     .controls .pill:hover{background:var(--sand);}
     .controls .pill[aria-pressed="true"]{background:var(--blue);color:var(--white);border-color:var(--blue);}
     .controls .togglebar{display:flex;gap:4px;flex:1;}
-    .controls select{flex:1;font-size:.9rem;border:1px solid var(--border);background:var(--bg);border-radius:6px;padding:4px 8px;font-family:inherit;}
+    /* Adjusted the styling for the select dropdown to not expand fully on desktop */
+    .controls select{
+      font-size:.9rem;
+      border:1px solid var(--border);
+      background:var(--bg);
+      border-radius:6px;
+      padding:4px 8px;
+      font-family:inherit;
+      max-width: 250px; /* New rule to constrain width on desktop */
+    }
     .controls .btn.ghost{color:var(--blue);border:1px solid transparent;background:transparent;}
 
     /* Buttons */
@@ -102,6 +111,40 @@
     .mobile-dock .dock-total{display:flex;justify-content:space-between;align-items:baseline;font-size:1.4rem;font-weight:500;}
     .mobile-dock .dock-total strong{font-size:1.8rem;font-weight:800;}
     @media(max-width:900px){.mobile-dock{display:block;}}
+    
+    /* NEW: Mobile-specific styles for better responsiveness */
+    @media (max-width: 600px) {
+        .container {
+            padding: 12px;
+        }
+        h1 {
+            font-size: 1.8rem;
+        }
+        .grand {
+            font-size: 1.6rem;
+        }
+        .grand span:first-child {
+            font-size: 1rem;
+        }
+        .controls .row {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .controls .togglebar {
+            flex-wrap: wrap; /* This is the key change to prevent horizontal overflow */
+            gap: 8px;
+            width: 100%;
+        }
+        .controls .pill {
+            flex: 1 1 auto;
+            text-align: center;
+        }
+        /* New rule to make the select dropdown full-width on mobile */
+        .controls select {
+          max-width: 100%;
+          width: 100%;
+        }
+    }
   </style>
 </head>
 <body>
